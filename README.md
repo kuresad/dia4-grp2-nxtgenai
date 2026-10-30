@@ -4,12 +4,11 @@ ESILV, Next-Generation AI (MESIIN475926), Didier Parisot. Public repository of t
 | Item | Value |
 |---|---|
 | Sub-group | GRP2  |
-| Members | Jason ZOH, Kuresa [TO COMPLETE], Paul [TO COMPLETE], [TO COMPLETE: five other members], Roy WEHBE, Yohan ALLOUCHE |
+| Members | Jason ZOH, Kuresa RAMEN, Paul CHARMOILLE, Enzo SIERRA-GUISSET, Roy WEHBE, Yohan ALLOUCHE, Florent SEYDOUX, Thomas ANQUETIN |
 | Pack version | `2026-10-14-students-1` (kit of 14 October 2026) |
 | Database | `data/boutique.sqlite`, SHA-256 `0077e235adc2ca647b484e3083c98a6d7cae3ef3655ce366a299caf13398fec2`, seed 20260925, identical to `data/manifest.json` |
 | Environment | Windows 11, Python 3.14.7, SQLite 3.50.4, `requests` in a `.venv` (only for `check_access.py`); the skeleton and scripts use the standard library |
-| Repository URL | [TO COMPLETE] |
-| TD 1 commit | [TO COMPLETE after the commit: full hash] |
+| Repository URL | [[lien repository]](https://github.com/kuresad/dia4-grp2-nxtgenai) |
 
 ## Status after TD 1 (21 October 2026)
 
@@ -36,16 +35,16 @@ experiments and never count as retries.
 
 | run_id | Operator | Model | Raw file | Start (UTC) | Base batch |
 |---|---|---|---|---|---|
-| `FULL-1` | [TO COMPLETE: classmate] | all five models in one `--run` | `traces-raw/traces-td1_full.csv` | 2026-10-21 13:50 | yes for E (Dots) only |
+| `FULL-1` | Enzo | all five models in one `--run` | `traces-raw/traces-td1_full.csv` | 2026-10-21 13:50 | yes for E (Dots) only |
 | `A-jason-1` | Jason (A) | `groq:openai/gpt-oss-120b` | `traces-raw/state-A.jsonl` | 14:12 | yes |
-| `B-1` | [TO COMPLETE] (B) | `groq:openai/gpt-oss-20b` | `traces-raw/traces-B.csv` | 14:14 | yes |
+| `B-1` | Yohan (B) | `groq:openai/gpt-oss-20b` | `traces-raw/traces-B.csv` | 14:14 | yes |
 | `D-kuresa-1` | Kuresa (D) | `groq:qwen/qwen3.8-27b` | `traces-raw/state-D-Kuresa.jsonl` | 14:17 | yes |
 | `D-paul-1` | Paul | `groq:qwen/qwen3.8-27b` | `traces-raw/state-D-Paul.jsonl` | 14:17 | repetition |
-| `A-op2-1` | [TO COMPLETE] | `groq:openai/gpt-oss-120b` | `traces-raw/trace_A.csv` | 14:20 | repetition |
+| `A-op2-1` | kuresa | `groq:openai/gpt-oss-120b` | `traces-raw/trace_A.csv` | 14:20 | repetition |
 | `A-jason-2` | Jason | `groq:openai/gpt-oss-120b` | `traces-raw/state-A_2.jsonl` | 14:31 | repetition |
 | `D-paul-2` | Paul | `groq:qwen/qwen3.8-27b` | `traces-raw/state-D_2-Paul.jsonl` | 14:32 | repetition |
 | `D-kuresa-2` | Kuresa | `groq:qwen/qwen3.8-27b` | `traces-raw/state-D-Kuresa2.jsonl` | 14:35 | repetition |
-| `C-jason-1` | Florient | `openrouter:cohere/north-mini-code:free` | `traces-raw/state-C.jsonl` | 14:37 | yes |
+| `C-jason-1` | Florent | `openrouter:cohere/north-mini-code:free` | `traces-raw/state-C.jsonl` | 14:37 | yes |
 | `E-jason-1` | Jason  | `openrouter:dots-studio/dots-3-note-preview:free` | `traces-raw/state-E-Jason.jsonl` | 19:18 | repetition |
 
 ## Commands to replay
@@ -75,8 +74,7 @@ No key, no `.env`, no account screenshot is committed. The kit's `.gitignore` is
 
 ## Open blocks
 
-- Member names, roles B, F, G, H, the operator of `FULL-1` and of `A-op2-1`, and who wrote/checked
-  each reference: [TO COMPLETE].
+- Member names, roles B, F, G, H, the operator of `FULL-1` and of `A-op2-1`.
 - The group used far more calls than the 100-cell base batch (319 attempts: 239 Groq, 80 OpenRouter):
   the repetitions were not in the planned allocation. They are kept and labelled, never mixed into the
   base-batch rates.
