@@ -29,9 +29,9 @@ PANEL3 = [A, B, C]
 PANEL5 = [A, B, C, D, E]
 
 
-def P(route, value):
+def P(route, value, verdict=None):
     return SimpleNamespace(provider=route[0], model_requested=route[1], value=value,
-                           verdict="executed" if value is not None else "error")
+                           verdict=verdict or ("executed" if value is not None else "error"))
 
 
 def short(route):
@@ -40,21 +40,27 @@ def short(route):
 
 # test_id, description, panel, values, k, expected (dict or "ValueError")
 CASES = [
-    ("T01", "agreement 3/3", PANEL3, [100, 100, 100], 2, {"consensus": True, "value": 100, "votes": 3}),
-    ("T02", "agreement 2/3", PANEL3, [100, 100, 120], 2, {"consensus": True, "value": 100, "votes": 2}),
+    ("T01", "agreement 3/3", PANEL3, [100, 100, 100], 2, {"consensus": True, "value": 100, "votes": 3, "models": ["groq:openai/gpt-oss-120b", "openrouter:cohere/north-mini-code:free", "groq:qwen/qwen3.8-27b"]}),
+    ("T02", "agreement 2/3", PANEL3, [100, 100, 120], 2, {"consensus": True, "value": 100, "votes": 2, "models": ["groq:openai/gpt-oss-120b", "openrouter:cohere/north-mini-code:free"]}),
     ("T03", "disagreement: three different values", PANEL3, [100, 110, 120], 2, {"consensus": False, "value": None, "votes": 1}),
-    ("T04", "one unavailable, the two others agree", PANEL3, [100, None, 100], 2, {"consensus": True, "value": 100, "votes": 2}),
+    ("T04", "one unavailable, the two others agree", PANEL3, [100, None, 100], 2, {"consensus": True, "value": 100, "votes": 2, "models": ["groq:openai/gpt-oss-120b", "groq:qwen/qwen3.8-27b"]}),
     ("T05", "one unavailable, the two others disagree: n stays 3", PANEL3, [100, None, 120], 2, {"consensus": False, "value": None, "votes": 1}),
     ("T06", "two unavailable: 1 vote < k, abstain (n stays 3)", PANEL3, [100, None, None], 2, {"consensus": False, "value": None, "votes": 1}),
     ("T07", "all unavailable", PANEL3, [None, None, None], 2, {"consensus": False, "value": None, "votes": 0}),
     ("T08", "duplicate route (same provider and model twice)", [A, A, C], [100, 100, 120], 2, "ValueError"),
     ("T09", "k=1 is not a strict majority of 3", PANEL3, [100, 110, 120], 1, "ValueError"),
     ("T10", "k=4 > n=3", PANEL3, [100, 100, 100], 4, "ValueError"),
-    ("T12", "3-of-5: three agree", PANEL5, [100, 100, None, 100, 90], 3, {"consensus": True, "value": 100, "votes": 3}),
+    ("T12", "3-of-5: three agree", PANEL5, [100, 100, None, 100, 90], 3, {"consensus": True, "value": 100, "votes": 3, "models": ["groq:openai/gpt-oss-120b", "openrouter:cohere/north-mini-code:free", "groq:openai/gpt-oss-20b"]}),
     ("T13", "3-of-5: only two agree, two unavailable", PANEL5, [100, 100, None, None, 90], 3, {"consensus": False, "value": None, "votes": 2}),
     ("T14", "2-of-5 refused (5 // 2 = 2)", PANEL5, [100, 100, 1, 2, 3], 2, "ValueError"),
-    ("T15", "wrong consensus is kept: the vote does not know the reference (100)", PANEL3, [0, 0, 100], 2, {"consensus": True, "value": 0, "votes": 2}),
-    ("T16", "value 0 is a vote, not a missing value", PANEL3, [0, None, 0], 2, {"consensus": True, "value": 0, "votes": 2}),
+    ("T15", "wrong consensus is kept: the vote does not know the reference (100)", PANEL3, [0, 0, 100], 2, {"consensus": True, "value": 0, "votes": 2, "models": ["groq:openai/gpt-oss-120b", "openrouter:cohere/north-mini-code:free"]}),
+    ("T16", "value 0 is a vote, not a missing value", PANEL3, [0, None, 0], 2, {"consensus": True, "value": 0, "votes": 2, "models": ["groq:openai/gpt-oss-120b", "groq:qwen/qwen3.8-27b"]}),
+    ("T17", "raw trace verdict 'correct' passed by mistake is refused, not silently ignored", PANEL3,
+     [100, 100, 100], 2, "ValueError", {"verdict": "correct"}),
+    ("T18", "distinct_families=True: gpt-oss-20b and gpt-oss-120b are one family", [A, D, C],
+     [100, 100, 120], 2, "ValueError", {"distinct_families": True}),
+    ("T19", "same panel without the option: the contract only refuses identical routes", [A, D, C],
+     [100, 100, 120], 2, {"consensus": True, "value": 100, "votes": 2}),
 ]
 
 
@@ -73,9 +79,11 @@ def main():
     CASES.insert(10, ("T11", "real trace FULL-1 C09: north-mini-code sql_invalid, 120b and qwen disagree",
                       PANEL3, c09, 2, {"consensus": False, "value": None, "votes": 1}))
     out_rows, failures = [], 0
-    for test_id, description, panel, values, k, expected in CASES:
+    for test_id, description, panel, values, k, expected, *extra in CASES:
+        options = dict(extra[0]) if extra else {}
+        verdict = options.pop("verdict", None)
         try:
-            result = vote([P(r, v) for r, v in zip(panel, values)], k)
+            result = vote([P(r, v, verdict) for r, v in zip(panel, values)], k, **options)
             actual = json.dumps(result)
             ok = expected != "ValueError" and all(result[key] == val for key, val in expected.items())
         except ValueError as exc:

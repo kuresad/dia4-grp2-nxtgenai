@@ -14,5 +14,8 @@ PASS T13 3-of-5: only two agree, two unavailable: {"consensus": false, "value": 
 PASS T14 2-of-5 refused (5 // 2 = 2): ValueError: k=2 is not a strict majority of n=5: need 2 < k <= 5.
 PASS T15 wrong consensus is kept: the vote does not know the reference (100): {"consensus": true, "value": 0, "votes": 2, "models": ["groq:openai/gpt-oss-120b", "openrouter:cohere/north-mini-code:free"]}
 PASS T16 value 0 is a vote, not a missing value: {"consensus": true, "value": 0, "votes": 2, "models": ["groq:openai/gpt-oss-120b", "groq:qwen/qwen3.8-27b"]}
+PASS T17 raw trace verdict 'correct' passed by mistake is refused, not silently ignored: ValueError: Unknown verdict 'correct': expected 'executed' or 'error' (convert trace rows into proposals before voting).
+PASS T18 distinct_families=True: gpt-oss-20b and gpt-oss-120b are one family: ValueError: Same model family twice in the panel (openai): one family is one vote.
+PASS T19 same panel without the option: the contract only refuses identical routes: {"consensus": true, "value": 100, "votes": 2, "models": ["groq:openai/gpt-oss-120b", "groq:openai/gpt-oss-20b"]}
 
-16/16 tests pass
+19/19 tests pass

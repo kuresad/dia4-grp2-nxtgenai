@@ -600,7 +600,7 @@ class Orchestrateur:
     # ---------------------------------------------------------------------
     # TO COMPLETE (TD 2): k-of-n voting
     # ---------------------------------------------------------------------
-    def vote_k_sur_n(self, traces_question: list, k: int):
+    def vote_k_sur_n(self, traces_question: list, k: int, distinct_families: bool = False):
         """TD 2 contract. `traces_question` holds the proposals of the panel for one
         question, as built by `atelier-vote.py`. Each proposal carries `provider`,
         `model_requested`, `value` (integer cents or None) and `verdict`
@@ -623,6 +623,14 @@ class Orchestrateur:
         consensus is not a proof of correctness. Keep the panel to distinct model
         families, and look in your traces for a case where several models agree
         on a wrong value.
+
+        Group additions (TD 2 review):
+          - a verdict other than `executed` / `error` raises ValueError instead of
+            being silently counted as an error: a raw trace row (verdict
+            `correct`) passed by mistake used to give an abstention with 0 votes;
+          - distinct_families=True also refuses two members of the same family
+            (vendor prefix of model_requested, e.g. openai/gpt-oss-20b and
+            openai/gpt-oss-120b): lecture 2 counts them as one vote.
         """
         def field(proposal, name):
             # atelier-vote.py passes SimpleNamespace objects; accept dicts too.
@@ -644,12 +652,20 @@ class Orchestrateur:
             if route in seen:
                 raise ValueError(f"Duplicate panel member {route[0]}:{route[1]}: a duplicate is not a second vote.")
             seen.add(route)
+        if distinct_families:
+            families = [str(field(p, "model_requested")).split("/", 1)[0] for p in proposals]
+            shared = sorted({f for f in families if families.count(f) > 1})
+            if shared:
+                raise ValueError(f"Same model family twice in the panel ({', '.join(shared)}): one family is one vote.")
 
         # Rule 1: only executed proposals carrying an integer value cast a vote.
         ballots: dict = {}
         for proposal in proposals:
-            value = field(proposal, "value")
-            if field(proposal, "verdict") != "executed" or value is None:
+            value, verdict = field(proposal, "value"), field(proposal, "verdict")
+            if verdict not in ("executed", "error"):
+                raise ValueError(f"Unknown verdict {verdict!r}: expected 'executed' or 'error' "
+                                 "(convert trace rows into proposals before voting).")
+            if verdict != "executed" or value is None:
                 continue  # error / unavailable: stays in n, no vote
             if isinstance(value, bool) or not isinstance(value, int):
                 raise ValueError(f"Value {value!r} is not an integer number of cents.")
