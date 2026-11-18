@@ -15,6 +15,10 @@ table readable. The reference is only used AFTER the decision, by the workshop.
 
 One file = one experiment: `atelier-vote.py` takes the last row per panel member,
 so a file that mixes runs (such as `td1/traces-td1.csv`) must not be used here.
+The driver now refuses such a file (several `run_id` for one panel member on one
+question) instead of voting on whatever row comes last: on `td1/traces-td1.csv`
+that silently produced a wrong consensus on C09 (0, north-mini-code from C-jason-1
+with qwen3.8-27b from D-kuresa-2).
 """
 import argparse
 import csv
@@ -38,6 +42,30 @@ def load_workshop():
     return module
 
 
+def mixed_runs(rows, panel):
+    """Panel members that have rows from more than one run on the same question."""
+    if not rows or "run_id" not in rows[0]:
+        return []  # a raw export of one run carries no run_id: one experiment by construction
+    runs = {}
+    for r in rows:
+        if (r["provider"], r["model_requested"]) in panel:
+            runs.setdefault((r["case_id"], r["model_requested"]), set()).add(r["run_id"])
+    return [f"{case} {model.split('/')[-1]}: {' + '.join(sorted(ids))}"
+            for (case, model), ids in sorted(runs.items()) if len(ids) > 1]
+
+
+def status(rows, case, provider, model):
+    """Why a member has no vote: the verdict of its last row, with the HTTP status if any."""
+    last = None
+    for r in rows:
+        if r["case_id"] == case and r["provider"] == provider and r["model_requested"] == model:
+            last = r
+    if last is None:
+        return "absent"
+    http = last.get("http_status", "")
+    return last["verdict"] + (f" (HTTP {http})" if http and http != "200" else "")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--traces", required=True, help="trace CSV of one experiment, relative to the repo root")
@@ -47,6 +75,11 @@ def main():
     workshop = load_workshop()
     with (ROOT / args.traces).open(encoding="utf-8", newline="") as handle:
         rows = list(csv.DictReader(handle))
+    mixed = mixed_runs(rows, workshop.PANEL)
+    if mixed:
+        raise SystemExit(f"{args.traces} mixes experiments, refused: " + "; ".join(mixed[:5])
+                         + (" ..." if len(mixed) > 5 else "") + ". Use one file per experiment.")
+    n = len(workshop.PANEL)
 
     OUT.mkdir(exist_ok=True)
     raw_lines, table = [], []
@@ -60,7 +93,9 @@ def main():
         out = json.loads(line)
         decision = out["decision"]
         members = workshop.proposals_for(rows, case, "real")
-        proposed = {SHORT[p.model_requested]: ("unavailable" if p.value is None else p.value) for p in members}
+        proposed = {SHORT[p.model_requested]: (p.value if p.value is not None
+                                               else status(rows, case, p.provider, p.model_requested))
+                    for p in members}
         if decision["consensus"]:
             agreement = "yes" if out["matches_reference"] else "NO (wrong consensus)"
         else:
@@ -72,7 +107,7 @@ def main():
             "qwen3.8-27b": proposed["qwen3.8-27b"],
             "decision": "consensus" if decision["consensus"] else "abstention",
             "value": "" if decision["value"] is None else decision["value"],
-            "votes": f'{decision["votes"]}/3',
+            "votes": f'{decision["votes"]}/{n}',
             "agreeing_models": " ".join(m.split(":", 1)[1] for m in decision["models"]),
             "reference": out["reference"],
             "agrees_with_reference": agreement,
@@ -93,7 +128,7 @@ def main():
     n_ok = sum(r["agrees_with_reference"] == "yes" for r in table)
     n_wrong = sum(r["agrees_with_reference"].startswith("NO") for r in table)
     print(f"\n{args.traces}: {n_cons} consensus ({n_ok} equal to the reference, {n_wrong} wrong), "
-          f"{20 - n_cons} abstentions, panel 2-of-3")
+          f"{len(CASES) - n_cons} abstentions, panel 2-of-{n}")
 
 
 if __name__ == "__main__":

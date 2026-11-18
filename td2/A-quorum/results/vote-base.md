@@ -21,4 +21,4 @@
 | C19 | 0 | 13930 | 83580 | abstention |  | 1/3 |  | 1990 | n/a (abstention) |
 | C20 | 1106090 | 1106090 | 1106090 | consensus | 1106090 | 3/3 | openai/gpt-oss-120b cohere/north-mini-code:free qwen/qwen3.8-27b | 1106090 | yes |
 
-traces-td1-base.csv: 16 consensus (16 equal to the reference, 0 wrong), 4 abstentions, panel 2-of-3
+td1/traces-td1-base.csv: 16 consensus (16 equal to the reference, 0 wrong), 4 abstentions, panel 2-of-3
