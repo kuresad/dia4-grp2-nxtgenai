@@ -16,34 +16,30 @@ The families follow `questions-td1.json` (`type` field); "completed age at a dat
 is `age on a reference date`, "age at the order" is `age at the time of the order`,
 "combinations" is every type containing a `+`.
 """
-import json
 import sys
 from collections import defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "td2"))
-from common import load_vote, proposal_from_row, read_csv, reference_values  # noqa: E402
+from common import FAMILIES, load_vote, proposal_from_row, question_families, read_csv, reference_values  # noqa: E402
+
 MODELS = ["openai/gpt-oss-20b", "openai/gpt-oss-120b", "qwen/qwen3.8-27b",
           "cohere/north-mini-code:free", "dots-studio/dots-3-note-preview:free"]
 SHORT = {m: m.split("/")[1].replace("-preview:free", "").replace(":free", "") for m in MODELS}
-FAMILY_OF_TYPE = {"period": "period", "age on a reference date": "completed age at a date",
-                  "age at the time of the order": "age at the order", "product list": "product list"}
 PANELS = {  # distinct families only: gpt-oss, Cohere, Qwen, Dots
     "fixed {gpt-oss-120b, north-mini-code, qwen3.8-27b}":
         ["openai/gpt-oss-120b", "cohere/north-mini-code:free", "qwen/qwen3.8-27b"],
     "alt {gpt-oss-20b, qwen3.8-27b, dots-3-note}":
         ["openai/gpt-oss-20b", "qwen/qwen3.8-27b", "dots-studio/dots-3-note-preview:free"],
 }
-FAMILIES = ["period", "completed age at a date", "age at the order", "product list", "combinations"]
 
 
 def main():
-    questions = json.loads((ROOT / "questions-td1.json").read_text(encoding="utf-8"))["questions"]
-    family = {q["id"]: ("combinations" if "+" in q["type"] else FAMILY_OF_TYPE[q["type"]]) for q in questions}
+    family = question_families()
     cases = defaultdict(list)
-    for q in questions:
-        cases[family[q["id"]]].append(q["id"])
+    for case, fam in family.items():
+        cases[fam].append(case)
 
     rows = read_csv(ROOT / "td1" / "traces-td1.csv")
     last, base_runs, run_order = {}, {}, {}

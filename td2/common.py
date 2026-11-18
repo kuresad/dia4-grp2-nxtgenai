@@ -64,3 +64,45 @@ def reference_rows(path):
 def read_csv(path):
     with Path(path).open(encoding="utf-8", newline="") as handle:
         return list(csv.DictReader(handle))
+
+
+# Question families of the TD 2 statement, from the `type` field of questions-td1.json.
+FAMILIES = ["period", "completed age at a date", "age at the order", "product list", "combinations"]
+_FAMILY_OF_TYPE = {"period": "period", "age on a reference date": "completed age at a date",
+                   "age at the time of the order": "age at the order", "product list": "product list"}
+
+
+def question_families(path=None):
+    """{case_id: family}; every type containing a '+' is a combination."""
+    import json
+    questions = json.loads(Path(path or ROOT / "questions-td1.json").read_text(encoding="utf-8"))["questions"]
+    return {q["id"]: ("combinations" if "+" in q["type"] else _FAMILY_OF_TYPE[q["type"]]) for q in questions}
+
+
+def family_scores(rows, families):
+    """Per (model, family): the base-batch run and score, and the score of every run.
+
+    Last attempt per (run, model, question) cell, in file order. Returns
+    {(model, family): {"base": (run, correct, total), "runs": [(run, correct, total), ...]}}.
+    """
+    last, runs, base = {}, {}, {}
+    for r in rows:
+        last[(r["run_id"], r["model_requested"], r["case_id"])] = r
+        runs.setdefault(r["model_requested"], [])
+        if r["run_id"] not in runs[r["model_requested"]]:
+            runs[r["model_requested"]].append(r["run_id"])
+        if r.get("in_base_batch") == "yes":
+            base[r["model_requested"]] = r["run_id"]
+    cases = {}
+    for case, fam in families.items():
+        cases.setdefault(fam, []).append(case)
+
+    def score(run, model, ids):
+        return sum(1 for c in ids if (run, model, c) in last and last[(run, model, c)]["verdict"] == "correct")
+
+    out = {}
+    for model, model_runs in runs.items():
+        for fam, ids in cases.items():
+            out[(model, fam)] = {"base": (base[model], score(base[model], model, ids), len(ids)),
+                                 "runs": [(run, score(run, model, ids), len(ids)) for run in model_runs]}
+    return out

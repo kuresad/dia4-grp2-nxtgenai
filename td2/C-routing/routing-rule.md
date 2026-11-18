@@ -61,9 +61,15 @@ Our rule: [`results/simulator-after.jsonl`](results/simulator-after.jsonl)
 | R3 / deferrable | combinations, dashboard, Groq free quota exhausted, refill 60 min | defer 60 | defer 60 min on `gpt-oss-20b:groq-free`, re-measure | refill within the 120 min deadline | assumption: refill in 60 min |
 | urgent | combinations, customer, Groq exhausted, 5 min | run senior-api 0.30 | run `gpt-oss-20b:groq-developer`, 0.000134 USD, reference | eligible paid route within budget | mean base tokens 641/286 × Groq prices |
 | R4 / budget exhausted | same, budget 0 | abstain | abstain | north and dots are available but failed combinations | north 0/5, dots 2/5 base |
-| R5 / high impact | age at a date, amount paid out | run + human review | run `gpt-oss-20b:groq-free` + 2-of-3 + reference + review | high cost of error | panel available 3/3 |
+| R5 / high impact | age at a date, amount paid out | run + human review | run `gpt-oss-20b:groq-free` + 2-of-3 + reference + review | high cost of error | 2 of 3 panel members usable (north not eligible on age): no failure tolerated |
 | unknown capability | "refund rate", never measured | abstain (level 4) | abstain | no TD 1 evidence on the family | assumption |
 | R2 / preferred unavailable | product list, customer, north down | (not in kit) | run `dots-3-note:free`, 2-of-3 with north in n | next eligible free route | dots 4/4; panel available 2/3 |
+
+**Added after review A (step 3).** Eligibility is now computed from the traces at start-up instead of
+typed by hand. With `--criterion every-run` (every cell correct in every run,
+[`results/simulator-after-every-run.jsonl`](results/simulator-after-every-run.jsonl)), only one decision
+changes: the high-impact age question goes to `gpt-oss-120b` (4/4 in its 4 runs) with a reference, because
+gpt-oss-20b (FULL-1 2/4) and qwen3.8-27b (D-paul-2 2/4) are no longer eligible and the quorum cannot confirm.
 
 **What changed from the kit rule.** Eligibility is the set of families measured correct, not a level;
 cheaper available models are ruled out by name with their failing cells; the check depends on the use and
