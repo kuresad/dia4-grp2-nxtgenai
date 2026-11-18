@@ -1,0 +1,4 @@
+# Keep kit files byte-identical to data/manifest.json on every OS
+# (core.autocrlf=true on Windows would turn LF into CRLF and break the SHA-256 checks).
+data/** -text
+schema.sql -text
