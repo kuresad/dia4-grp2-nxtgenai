@@ -22,6 +22,23 @@ ESILV, Next-Generation AI (MESIIN475926), Didier Parisot. Public repository of t
 | Pivot view models x questions | [`notes/pivot-td1.md`](notes/pivot-td1.md) | Generated from the comparison CSV; also every run and the cells that change between runs |
 | Five-model summary | [`five-model-summary-en.csv`](five-model-summary-en.csv) | Index, dated prices or N/A with reason, access, results by family |
 
+## Status after TD 2 (18 November 2026)
+
+Report: [`reports/td2.md`](reports/td2.md). No model call in TD 2: the stored TD 1 traces are replayed offline.
+
+| Deliverable | File | Status |
+|---|---|---|
+| `vote_k_sur_n` completed | [`skeleton-multi-llm-en.py`](skeleton-multi-llm-en.py) | Done; 16/16 contract tests ([`td2/A-quorum/voting-tests-en.csv`](td2/A-quorum/voting-tests-en.csv)) |
+| Declared panel and threshold | gpt-oss-120b (Groq), north-mini-code:free (OpenRouter), qwen3.8-27b (Groq), 2-of-3 | Fixed panel of the statement |
+| Twenty decisions of the vote | [`td2/A-quorum/results/vote-base.md`](td2/A-quorum/results/vote-base.md), [`vote-full1.md`](td2/A-quorum/results/vote-full1.md) | Base: 16 consensus (0 wrong), 4 abstentions |
+| Commented wrong consensus | [`td2/B-consensus/wrong-consensus.md`](td2/B-consensus/wrong-consensus.md) | C02 (FULL-1), C10, C11 real; DEMO-VOTE synthetic, kept apart |
+| One-page routing rule | [`td2/C-routing/routing-rule.md`](td2/C-routing/routing-rule.md) | Cites the TD 1 cells ([`family-evidence.md`](td2/C-routing/results/family-evidence.md)) |
+| Simulator before / after | [`simulator-before.jsonl`](td2/C-routing/results/simulator-before.jsonl), [`simulator-after.jsonl`](td2/C-routing/results/simulator-after.jsonl) | Kit `atelier-routage.py`, then [`td2/C-routing/atelier-routage-grp2.py`](td2/C-routing/atelier-routage-grp2.py) |
+| Prompts | [`prompts-en.md`](prompts-en.md) | Unchanged since TD 1 (319/319 fingerprints match) |
+| AI assistance | [`td2/ai-assistance-en.md`](td2/ai-assistance-en.md) | Prompt kept as used |
+
+Replay (no network): see the command block at the end of [`reports/td2.md`](reports/td2.md).
+
 ## The runs
 
 All runs used the same prompt (same fingerprint per question), the same references and the kit
@@ -74,3 +91,4 @@ No key, no `.env`, no account screenshot is committed. The kit's `.gitignore` is
 - The group used far more calls than the 100-cell base batch (319 attempts: 239 Groq, 80 OpenRouter):
   the repetitions were not in the planned allocation. They are kept and labelled, never mixed into the
   base-batch rates.
+- `reports/td1.md` and member contributions for TD 2 are still to be written by the group (see [`reports/td2.md`](reports/td2.md)).

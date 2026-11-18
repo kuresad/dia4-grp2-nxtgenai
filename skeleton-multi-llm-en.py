@@ -624,7 +624,46 @@ class Orchestrateur:
         families, and look in your traces for a case where several models agree
         on a wrong value.
         """
-        raise NotImplementedError("vote_k_sur_n: to implement in TD 2 (see the procedure in the docstring).")
+        def field(proposal, name):
+            # atelier-vote.py passes SimpleNamespace objects; accept dicts too.
+            if isinstance(proposal, dict):
+                return proposal.get(name)
+            return getattr(proposal, name, None)
+
+        proposals = list(traces_question)
+        n = len(proposals)  # every panel member counts in n, voting or not
+        if isinstance(k, bool) or not isinstance(k, int):
+            raise ValueError(f"k must be an integer, got {k!r}.")
+        if not (n // 2 < k <= n):
+            raise ValueError(f"k={k} is not a strict majority of n={n}: need {n // 2} < k <= {n}.")
+
+        # Rule 3: one vote per (provider, model) pair; a duplicate route is refused.
+        seen = set()
+        for proposal in proposals:
+            route = (field(proposal, "provider"), field(proposal, "model_requested"))
+            if route in seen:
+                raise ValueError(f"Duplicate panel member {route[0]}:{route[1]}: a duplicate is not a second vote.")
+            seen.add(route)
+
+        # Rule 1: only executed proposals carrying an integer value cast a vote.
+        ballots: dict = {}
+        for proposal in proposals:
+            value = field(proposal, "value")
+            if field(proposal, "verdict") != "executed" or value is None:
+                continue  # error / unavailable: stays in n, no vote
+            if isinstance(value, bool) or not isinstance(value, int):
+                raise ValueError(f"Value {value!r} is not an integer number of cents.")
+            ballots.setdefault(value, []).append(
+                f"{field(proposal, 'provider')}:{field(proposal, 'model_requested')}")
+
+        # Rule 4: k > n/2, so at most one value can reach k.
+        for value, members in ballots.items():
+            if len(members) >= k:
+                return {"consensus": True, "value": value, "votes": len(members), "models": members}
+
+        # Rule 5: abstain, never invent a value.
+        largest = max((len(m) for m in ballots.values()), default=0)
+        return {"consensus": False, "value": None, "votes": largest, "models": []}
 
 
 # ==========================================================================

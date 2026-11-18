@@ -1,0 +1,18 @@
+PASS T01 agreement 3/3: {"consensus": true, "value": 100, "votes": 3, "models": ["groq:openai/gpt-oss-120b", "openrouter:cohere/north-mini-code:free", "groq:qwen/qwen3.8-27b"]}
+PASS T02 agreement 2/3: {"consensus": true, "value": 100, "votes": 2, "models": ["groq:openai/gpt-oss-120b", "openrouter:cohere/north-mini-code:free"]}
+PASS T03 disagreement: three different values: {"consensus": false, "value": null, "votes": 1, "models": []}
+PASS T04 one unavailable, the two others agree: {"consensus": true, "value": 100, "votes": 2, "models": ["groq:openai/gpt-oss-120b", "groq:qwen/qwen3.8-27b"]}
+PASS T05 one unavailable, the two others disagree: n stays 3: {"consensus": false, "value": null, "votes": 1, "models": []}
+PASS T06 two unavailable: 1 vote < k, abstain (n stays 3): {"consensus": false, "value": null, "votes": 1, "models": []}
+PASS T07 all unavailable: {"consensus": false, "value": null, "votes": 0, "models": []}
+PASS T08 duplicate route (same provider and model twice): ValueError: Duplicate panel member groq:openai/gpt-oss-120b: a duplicate is not a second vote.
+PASS T09 k=1 is not a strict majority of 3: ValueError: k=1 is not a strict majority of n=3: need 1 < k <= 3.
+PASS T10 k=4 > n=3: ValueError: k=4 is not a strict majority of n=3: need 1 < k <= 3.
+PASS T11 real trace FULL-1 C09: north-mini-code sql_invalid, 120b and qwen disagree: {"consensus": false, "value": null, "votes": 1, "models": []}
+PASS T12 3-of-5: three agree: {"consensus": true, "value": 100, "votes": 3, "models": ["groq:openai/gpt-oss-120b", "openrouter:cohere/north-mini-code:free", "groq:openai/gpt-oss-20b"]}
+PASS T13 3-of-5: only two agree, two unavailable: {"consensus": false, "value": null, "votes": 2, "models": []}
+PASS T14 2-of-5 refused (5 // 2 = 2): ValueError: k=2 is not a strict majority of n=5: need 2 < k <= 5.
+PASS T15 wrong consensus is kept: the vote does not know the reference (100): {"consensus": true, "value": 0, "votes": 2, "models": ["groq:openai/gpt-oss-120b", "openrouter:cohere/north-mini-code:free"]}
+PASS T16 value 0 is a vote, not a missing value: {"consensus": true, "value": 0, "votes": 2, "models": ["groq:openai/gpt-oss-120b", "groq:qwen/qwen3.8-27b"]}
+
+16/16 tests pass

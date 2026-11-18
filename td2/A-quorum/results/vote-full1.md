@@ -1,0 +1,24 @@
+| case_id | gpt-oss-120b | north-mini-code | qwen3.8-27b | decision | value | votes | agreeing_models | reference | agrees_with_reference |
+|---|---|---|---|---|---|---|---|---|---|
+| C01 | 792800 | 792800 | 792800 | consensus | 792800 | 3/3 | openai/gpt-oss-120b cohere/north-mini-code:free qwen/qwen3.8-27b | 792800 | yes |
+| C02 | 590320 | 0 | 590320 | consensus | 590320 | 2/3 | openai/gpt-oss-120b qwen/qwen3.8-27b | 590320 | yes |
+| C03 | 936350 | 936350 | 936350 | consensus | 936350 | 3/3 | openai/gpt-oss-120b cohere/north-mini-code:free qwen/qwen3.8-27b | 936350 | yes |
+| C04 | 2826250 | 2826250 | 2826250 | consensus | 2826250 | 3/3 | openai/gpt-oss-120b cohere/north-mini-code:free qwen/qwen3.8-27b | 2826250 | yes |
+| C05 | 38480 | 38480 | 38480 | consensus | 38480 | 3/3 | openai/gpt-oss-120b cohere/north-mini-code:free qwen/qwen3.8-27b | 38480 | yes |
+| C06 | 0 | 0 | 0 | consensus | 0 | 3/3 | openai/gpt-oss-120b cohere/north-mini-code:free qwen/qwen3.8-27b | 0 | yes |
+| C07 | 13970 | 13970 | 13970 | consensus | 13970 | 3/3 | openai/gpt-oss-120b cohere/north-mini-code:free qwen/qwen3.8-27b | 13970 | yes |
+| C08 | 605580 | 1188090 | 605580 | consensus | 605580 | 2/3 | openai/gpt-oss-120b qwen/qwen3.8-27b | 605580 | yes |
+| C09 | 487980 | unavailable | 0 | abstention |  | 1/3 |  | 487980 | n/a (abstention) |
+| C10 | 558980 | 548920 | 119410 | abstention |  | 1/3 |  | 558980 | n/a (abstention) |
+| C11 | 446690 | 446690 | 446690 | consensus | 446690 | 3/3 | openai/gpt-oss-120b cohere/north-mini-code:free qwen/qwen3.8-27b | 446690 | yes |
+| C12 | 1666490 | 1666490 | 1666490 | consensus | 1666490 | 3/3 | openai/gpt-oss-120b cohere/north-mini-code:free qwen/qwen3.8-27b | 1666490 | yes |
+| C13 | 107740 | 107740 | 107740 | consensus | 107740 | 3/3 | openai/gpt-oss-120b cohere/north-mini-code:free qwen/qwen3.8-27b | 107740 | yes |
+| C14 | 0 | 0 | 0 | consensus | 0 | 3/3 | openai/gpt-oss-120b cohere/north-mini-code:free qwen/qwen3.8-27b | 0 | yes |
+| C15 | 168680 | 314020 | 0 | abstention |  | 1/3 |  | 168680 | n/a (abstention) |
+| C16 | 376740 | 376740 | 367050 | consensus | 376740 | 2/3 | openai/gpt-oss-120b cohere/north-mini-code:free | 376740 | yes |
+| C17 | 258180 | 371990 | 248490 | abstention |  | 1/3 |  | 258180 | n/a (abstention) |
+| C18 | 62480 | 62480 | 62480 | consensus | 62480 | 3/3 | openai/gpt-oss-120b cohere/north-mini-code:free qwen/qwen3.8-27b | 62480 | yes |
+| C19 | 1990 | 71640 | 83580 | abstention |  | 1/3 |  | 1990 | n/a (abstention) |
+| C20 | 1106090 | 1106090 | 1106090 | consensus | 1106090 | 3/3 | openai/gpt-oss-120b cohere/north-mini-code:free qwen/qwen3.8-27b | 1106090 | yes |
+
+traces-raw/traces-td1_full.csv: 15 consensus (15 equal to the reference, 0 wrong), 5 abstentions, panel 2-of-3
