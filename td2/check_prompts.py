@@ -13,14 +13,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "td2"))
-from common import read_csv, skeleton as load_skeleton  # noqa: E402
+from common import TRACES_ALL, read_csv, skeleton as load_skeleton  # noqa: E402
 
 skeleton = load_skeleton()
 
 schema = (ROOT / "schema.sql").read_text(encoding="utf-8")
 questions = json.loads((ROOT / "questions-td1.json").read_text(encoding="utf-8"))["questions"]
 expected = {q["id"]: skeleton.build_prompt(schema, q["question"])[2] for q in questions}
-rows = read_csv(ROOT / "td1" / "traces-td1.csv")
+rows = read_csv(TRACES_ALL)
 mismatch = [(r["run_id"], r["model_requested"], r["case_id"]) for r in rows
             if r["prompt_sha256"] != expected[r["case_id"]]]
 print(f"{len(rows)} trace rows, {len(expected)} prompts rebuilt from skeleton-multi-llm-en.py; "

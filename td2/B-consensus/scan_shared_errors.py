@@ -24,7 +24,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "td2"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import load_vote, proposal_from_row, read_csv, reference_values  # noqa: E402
+from common import REFERENCE, TRACES_ALL, load_vote, proposal_from_row, read_csv, reference_values  # noqa: E402
 from probes import population_lines  # noqa: E402
 
 PANEL = ["openai/gpt-oss-120b", "cohere/north-mini-code:free", "qwen/qwen3.8-27b"]
@@ -35,8 +35,8 @@ def short(model):
 
 
 def main():
-    rows = read_csv(ROOT / "td1" / "traces-td1.csv")
-    refs = reference_values(ROOT / "td1" / "reference-td1.csv")
+    rows = read_csv(TRACES_ALL)
+    refs = reference_values(REFERENCE)
     vote = load_vote()
     last, runs_of = {}, defaultdict(list)
     for r in rows:

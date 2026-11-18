@@ -28,24 +28,38 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "td2"))
-from common import FAMILIES, family_scores, question_families, read_csv  # noqa: E402
+from common import FAMILIES, TRACES_ALL, family_scores, question_families, read_csv  # noqa: E402
 
 # Paid-equivalent cost of ONE request on the usage-billed route of the same model:
-# mean base-batch tokens of td1/traces-td1.csv (in_base_batch = yes) x Groq prices of
-# methode-cout-en.md step 2 (checked 2026-10-05), USD excl. tax.
-#   gpt-oss-20b : 641 in x 0.075 + 286 out x 0.30 per million -> 0.000134
-#   gpt-oss-120b: 641 in x 0.15  + 259 out x 0.60 per million -> 0.000252
-#   qwen3.8-27b : 630 in x 0.80  + 138 out x 4.00 per million -> 0.001056
-TOKENS = {"gpt-oss-20b": (641, 286), "gpt-oss-120b": (641, 259), "qwen3.8-27b": (630, 138)}
+# mean tokens of the successful base-batch answers of td1/traces-td1.csv x Groq prices
+# of methode-cout-en.md step 2 (checked 2026-10-05), USD excl. tax per million tokens.
+# The tokens and the latency are MEASURED here from the traces (review B, step 3); they
+# used to be copied by hand (641/286 ...) and would silently go stale with new traces.
 PRICES = {"gpt-oss-20b": (0.075, 0.30), "gpt-oss-120b": (0.15, 0.60), "qwen3.8-27b": (0.80, 4.00)}
 
 
+def _measure():
+    tokens, latency = {}, {}
+    rows = [r for r in read_csv(TRACES_ALL) if r["in_base_batch"] == "yes" and r["http_status"] == "200"]
+    for model in {r["model_requested"] for r in rows}:
+        mine = [r for r in rows if r["model_requested"] == model]
+        name = model.split("/")[-1]
+        tokens[name] = (round(sum(int(r["tokens_prompt"]) for r in mine) / len(mine)),
+                        round(sum(int(r["tokens_completion"]) for r in mine) / len(mine)))
+        latency[model] = round(sum(float(r["latency_ms"]) for r in mine) / len(mine))
+    return tokens, latency
+
+
+TOKENS, LATENCY_MS = _measure()
+
+
 def per_request(model):
+    """USD per request; TOKENS keys are short names (gpt-oss-20b), PRICES has the same keys."""
     (t_in, t_out), (p_in, p_out) = TOKENS[model], PRICES[model]
     return round((t_in * p_in + t_out * p_out) / 1e6, 6)
 
 
-SCORES = family_scores(read_csv(ROOT / "td1" / "traces-td1.csv"), question_families())
+SCORES = family_scores(read_csv(TRACES_ALL), question_families())
 
 
 def eligible_families(model, criterion):
@@ -77,22 +91,22 @@ def evidence(model, family):
 # price_rank: portfolio price per million output tokens of the model (0 for :free routes,
 # which have no paid route), used to order the included routes by cost.
 ROUTES = [
-    ("north-mini-code:free", "openrouter", "cohere/north-mini-code:free", "free", 0.0, 0.0, 1930),
-    ("dots-3-note:free", "openrouter", "dots-studio/dots-3-note-preview:free", "free", 0.0, 0.0, 3482),
-    ("gpt-oss-20b:groq-free", "groq", "openai/gpt-oss-20b", "free", 0.0, 0.30, 825),
-    ("gpt-oss-120b:groq-free", "groq", "openai/gpt-oss-120b", "free", 0.0, 0.60, 961),
-    ("qwen3.8-27b:groq-free", "groq", "qwen/qwen3.8-27b", "free", 0.0, 4.00, 516),
-    ("gpt-oss-20b:groq-developer", "groq", "openai/gpt-oss-20b", "tokens", per_request("gpt-oss-20b"), 0.30, 825),
-    ("gpt-oss-120b:groq-developer", "groq", "openai/gpt-oss-120b", "tokens", per_request("gpt-oss-120b"), 0.60, 961),
-    ("qwen3.8-27b:groq-developer", "groq", "qwen/qwen3.8-27b", "tokens", per_request("qwen3.8-27b"), 4.00, 516),
+    ("north-mini-code:free", "openrouter", "cohere/north-mini-code:free", "free", 0.0, 0.0),
+    ("dots-3-note:free", "openrouter", "dots-studio/dots-3-note-preview:free", "free", 0.0, 0.0),
+    ("gpt-oss-20b:groq-free", "groq", "openai/gpt-oss-20b", "free", 0.0, 0.30),
+    ("gpt-oss-120b:groq-free", "groq", "openai/gpt-oss-120b", "free", 0.0, 0.60),
+    ("qwen3.8-27b:groq-free", "groq", "qwen/qwen3.8-27b", "free", 0.0, 4.00),
+    ("gpt-oss-20b:groq-developer", "groq", "openai/gpt-oss-20b", "tokens", per_request("gpt-oss-20b"), 0.30),
+    ("gpt-oss-120b:groq-developer", "groq", "openai/gpt-oss-120b", "tokens", per_request("gpt-oss-120b"), 0.60),
+    ("qwen3.8-27b:groq-developer", "groq", "qwen/qwen3.8-27b", "tokens", per_request("qwen3.8-27b"), 4.00),
 ]
 
 
 def build_resources(criterion="base"):
     return [{"id": rid, "model": f"{provider}:{model}", "access": access, "available": True, "cash": cash,
-             "price_rank": rank, "latency_ms": latency, "reset_minutes": None,
+             "price_rank": rank, "latency_ms": LATENCY_MS[model], "reset_minutes": None,
              "families": eligible_families(model, criterion)}
-            for rid, provider, model, access, cash, rank, latency in ROUTES]
+            for rid, provider, model, access, cash, rank in ROUTES]
 
 
 RESOURCES = build_resources("base")

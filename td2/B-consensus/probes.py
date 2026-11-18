@@ -15,7 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "td2"))
-from common import reference_rows  # noqa: E402
+from common import REFERENCE, reference_rows  # noqa: E402
 from sandbox_sqlite import execute_query  # noqa: E402
 
 DB = ROOT / "data" / "boutique.sqlite"
@@ -26,7 +26,7 @@ _REFS = None
 def _probe(case, expression):
     global _REFS
     if _REFS is None:
-        _REFS = reference_rows(ROOT / "td1" / "reference-td1.csv")
+        _REFS = reference_rows(REFERENCE)
     sql = _REFS[case]["sql"]
     if not SELECT.search(sql):
         raise ValueError(f"{case}: reference SQL does not start with 'SELECT ... AS revenue_cents FROM'")

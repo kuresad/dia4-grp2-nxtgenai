@@ -16,6 +16,13 @@ from types import SimpleNamespace
 
 ROOT = Path(__file__).resolve().parents[1]
 
+# The TD 1 inputs, named once. Moving them (as when they went into td1/) changes these lines only.
+TD1 = ROOT / "td1"
+TRACES_ALL = TD1 / "traces-td1.csv"                      # every attempt of every run
+TRACES_BASE = TD1 / "traces-td1-base.csv"                # base batch only
+TRACES_FULL1 = TD1 / "traces-raw" / "traces-td1_full.csv"  # run FULL-1, the five models together
+REFERENCE = TD1 / "reference-td1.csv"
+
 # Verdicts of the skeleton (Trace.verdict) whose `value` is a result of the SQL.
 # Every other verdict (sql_invalid, sql_rejected, access_error, not_executed) is an
 # unavailable member: it stays in n and casts no vote.

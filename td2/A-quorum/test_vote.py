@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[2]
 HERE = Path(__file__).resolve().parent
 
 sys.path.insert(0, str(ROOT / "td2"))
-from common import load_vote, proposal_from_row, read_csv  # noqa: E402
+from common import TRACES_FULL1, load_vote, proposal_from_row, read_csv  # noqa: E402
 
 vote = load_vote()
 
@@ -66,7 +66,7 @@ CASES = [
 
 def real_c09_full1():
     """T11: FULL-1, C09: north-mini-code returned sql_invalid (no value) -> unavailable member."""
-    rows = read_csv(ROOT / "td1/traces-raw/traces-td1_full.csv")
+    rows = read_csv(TRACES_FULL1)
     last = {}
     for r in rows:
         if r["case_id"] == "C09":

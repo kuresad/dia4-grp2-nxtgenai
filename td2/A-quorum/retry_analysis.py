@@ -23,7 +23,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "td2"))
-from common import read_csv  # noqa: E402
+from common import TRACES_ALL, read_csv  # noqa: E402
 
 QUOTA = re.compile(r"on (?P<kind>[^:]+?) \((?P<code>\w+)\): Limit (?P<limit>\d+), Used (?P<used>\d+), "
                    r"Requested (?P<requested>\d+)")
@@ -35,7 +35,7 @@ def when(row):
 
 
 def main():
-    rows = read_csv(ROOT / "td1" / "traces-td1.csv")
+    rows = read_csv(TRACES_ALL)
     cells = defaultdict(list)  # (run, model, case) -> attempts in file order
     for r in rows:
         cells[(r["run_id"], r["model_requested"], r["case_id"])].append(r)

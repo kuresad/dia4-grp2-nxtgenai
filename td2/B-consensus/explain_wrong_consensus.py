@@ -26,14 +26,14 @@ DB = ROOT / "data" / "boutique.sqlite"
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "td2"))
 from sandbox_sqlite import execute_query  # noqa: E402  (kit file, read-only sandbox)
-from common import load_vote, proposal_from_row, read_csv, reference_rows  # noqa: E402
+from common import REFERENCE, TRACES_ALL, load_vote, proposal_from_row, read_csv, reference_rows  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from probes import population_lines, smallest_line_amount  # noqa: E402
 
 VOTE = load_vote()
-TRACES = read_csv(ROOT / "td1" / "traces-td1.csv")
-REFS = reference_rows(ROOT / "td1" / "reference-td1.csv")
+TRACES = read_csv(TRACES_ALL)
+REFS = reference_rows(REFERENCE)
 
 
 def final_row(model, case, *, run_id=None, base=False):

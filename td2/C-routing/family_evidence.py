@@ -22,7 +22,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "td2"))
-from common import FAMILIES, load_vote, proposal_from_row, question_families, read_csv, reference_values  # noqa: E402
+from common import FAMILIES, REFERENCE, TRACES_ALL, load_vote, proposal_from_row, question_families, read_csv, reference_values  # noqa: E402
 
 MODELS = ["openai/gpt-oss-20b", "openai/gpt-oss-120b", "qwen/qwen3.8-27b",
           "cohere/north-mini-code:free", "dots-studio/dots-3-note-preview:free"]
@@ -41,7 +41,7 @@ def main():
     for case, fam in family.items():
         cases[fam].append(case)
 
-    rows = read_csv(ROOT / "td1" / "traces-td1.csv")
+    rows = read_csv(TRACES_ALL)
     last, base_runs, run_order = {}, {}, {}
     provider = {r["model_requested"]: r["provider"] for r in rows}  # read from the traces, not guessed
     for r in rows:  # file order = attempt order inside each run
@@ -77,7 +77,7 @@ def main():
 
     # Candidate 2-of-3 panels, voted with the group's vote_k_sur_n (no network).
     vote = load_vote()
-    refs = reference_values(ROOT / "td1" / "reference-td1.csv")
+    refs = reference_values(REFERENCE)
 
     def proposals(panel, case, source):
         out = []
