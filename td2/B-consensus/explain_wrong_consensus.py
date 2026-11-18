@@ -28,6 +28,9 @@ sys.path.insert(0, str(ROOT / "td2"))
 from sandbox_sqlite import execute_query  # noqa: E402  (kit file, read-only sandbox)
 from common import load_vote, proposal_from_row, read_csv, reference_rows  # noqa: E402
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from probes import population_lines, smallest_line_amount  # noqa: E402
+
 VOTE = load_vote()
 TRACES = read_csv(ROOT / "td1" / "traces-td1.csv")
 REFS = reference_rows(ROOT / "td1" / "reference-td1.csv")
@@ -74,7 +77,16 @@ INDEPENDENT = {
     "C02": lambda: python_revenue(lambda o: date(2026, 9, 25)),
     "C11": lambda: python_revenue(lambda o: date(2026, 12, 1)),
     "C10": lambda: python_revenue(order_day),
+    "C09": lambda: python_revenue(lambda o: date(2026, 9, 26)),
 }
+
+
+def non_empty_probe(case):
+    """Executed on the database (probes.py), no longer asserted: a 0 is impossible if lines > 0 and min > 0."""
+    lines, smallest = population_lines(case), smallest_line_amount(case)
+    verdict = "a revenue of 0 is impossible" if lines and smallest and smallest > 0 else "0 is possible"
+    print(f"  non-empty probe (reference population, read-only SQL): {lines} order lines, "
+          f"smallest line amount {smallest} cents -> {verdict}")
 
 
 def show_case(title, case, members, nature):
@@ -106,8 +118,7 @@ def main():
     full = {m: final_row(m, "C02", run_id="FULL-1") for m in (m120, m20, cohere, qwen, dots)}
     py, lines = show_case("Case WC-1: C02 in run FULL-1 (one run, five models, same prompt)", "C02",
                           [(m, full[m]) for m in (m20, cohere)], "real batch (historical real, stored trace replayed offline)")
-    print(f"  non-empty check: {lines} order lines belong to customers aged 25 on 2026-09-25, "
-          f"all prices and quantities > 0, so 0 is impossible")
+    non_empty_probe("C02")
     print("  quorum, 2-of-3:")
     vote_line("declared fixed panel {gpt-oss-120b, north-mini-code, qwen3.8-27b}", [full[m120], full[cohere], full[qwen]])
     vote_line("alternative panel {gpt-oss-20b, north-mini-code, qwen3.8-27b}  (cheapest gpt-oss)", [full[m20], full[cohere], full[qwen]])
@@ -115,7 +126,7 @@ def main():
     base = {m: final_row(m, "C11", base=True) for m in (m120, m20, cohere, qwen, dots)}
     py, lines = show_case("Case WC-2: C11 in the base batch", "C11",
                           [(m, base[m]) for m in (cohere, dots)], "real batch (base batch = one run per model)")
-    print(f"  non-empty check: {lines} order lines belong to customers aged 25 on 2026-12-01")
+    non_empty_probe("C11")
     print("  quorum, 2-of-3:")
     vote_line("declared fixed panel {gpt-oss-120b, north-mini-code, qwen3.8-27b}", [base[m120], base[cohere], base[qwen]])
     vote_line("alternative panel {gpt-oss-120b, north-mini-code, dots-3-note}  (both :free OpenRouter models)",
@@ -145,6 +156,20 @@ def main():
               [c10["120b"], c10["cohere"], c10["qwen"]])
     vote_line("panel recomposed across runs {gpt-oss-120b, qwen3.8-27b, dots-3-note} (illustration only)",
               [c10["120b"], c10["qwen"], c10["dots"]])
+
+    c09 = {"cohere": final_row(cohere, "C09", run_id="C-jason-1"), "qwen": final_row(qwen, "C09", run_id="D-kuresa-2"),
+           "dots": final_row(dots, "C09", run_id="E-jason-1"), "120b": final_row(m120, "C09", run_id="A-jason-1"),
+           "qwen_base": final_row(qwen, "C09", run_id="D-kuresa-1")}
+    show_case("Case WC-4: C09, three families on 0, found by scan_shared_errors.py", "C09",
+              [(f"{cohere} (C-jason-1, base)", c09["cohere"]), (f"{qwen} (D-kuresa-2, repetition)", c09["qwen"]),
+               (f"{dots} (E-jason-1, repetition)", c09["dots"])],
+              "real, values from three different runs; qwen3.8-27b returns this 0 in 3 of its 5 runs")
+    non_empty_probe("C09")
+    print("  quorum, 2-of-3:")
+    vote_line("declared fixed panel, base runs (A-jason-1, C-jason-1, D-kuresa-1)",
+              [c09["120b"], c09["cohere"], c09["qwen_base"]])
+    vote_line("declared fixed panel, qwen from its repetition D-kuresa-2 (illustration)",
+              [c09["120b"], c09["cohere"], c09["qwen"]])
 
     # 4. DEMO-VOTE --------------------------------------------------------------
     print("\n=== DEMO-VOTE (synthetic, supplied by the TD 2 statement; not model output, not the shop data) ===")

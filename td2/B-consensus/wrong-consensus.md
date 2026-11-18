@@ -13,6 +13,12 @@ reference, 4 abstentions) or in run FULL-1 (15 and 5): [`vote-base.md`](../A-quo
 the same wrong value. They show what a panel built differently would have returned. The two-model agreement
 is not the result of the fixed panel. Dots is not a member of that panel.
 
+**Added after the review (WC-4).** The first version picked the cases by hand. A systematic scan
+([`scan_shared_errors.py`](scan_shared_errors.py) → [`results/shared-errors.md`](results/shared-errors.md))
+finds a fourth case, missed before, where the **fixed panel itself** gives a wrong consensus: C09 is 0 in
+12 of the 40 combinations of one run per member. The base batch escapes it only because qwen3.8-27b got
+C09 right in D-kuresa-1, and it gets it wrong in 3 of its 5 runs.
+
 ## WC-1 (main case): C02, run FULL-1, real batch
 
 - **Question** (C02, age on a reference date): revenue of customers who are exactly 25 years old (completed
@@ -37,9 +43,10 @@ WHERE ... c.birth_date <= date('2026-09-25','-25 years') AND c.birth_date > date
 - **Declared quorum, 2-of-3**: fixed panel → `{"consensus": true, "value": 590320, "votes": 2}` (120b and
   qwen), **correct**. Alternative panel {gpt-oss-20b, north-mini-code, qwen3.8-27b} (the cheapest gpt-oss
   model in place of 120b) → `{"consensus": true, "value": 0, "votes": 2}`, a **wrong consensus**.
-- **Independent check**: a *non-empty population* probe. Execute the age filter alone and count the order
-  lines: 82, all with a price and a quantity > 0, so a revenue of 0 is impossible. It runs on the
-  database, needs no model, and refutes the wrong consensus 0. This is the dashboard check of the
+- **Independent check**: a *non-empty population* probe ([`probes.py`](probes.py)). The reference query is
+  re-executed read-only with `COUNT(*)` and `MIN(quantity x price)`: 82 order lines, smallest line 1250
+  cents, so a revenue of 0 is impossible. It runs on the database, needs no model, and refutes the wrong
+  consensus 0. This is the dashboard check of the
   age families in our [routing rule](../C-routing/routing-rule.md).
 
 ## WC-3 (same non-zero wrong value from two families): C10, real but across two runs
@@ -80,6 +87,34 @@ WHERE year(o.date) - year(c.birth_date) = 25 AND (month, day of order) >= (month
 Fixed panel: consensus 446690, correct. Panel of the two `:free` OpenRouter models with gpt-oss-120b:
 consensus 0. The same non-empty probe (60 matching lines) refutes it.
 
+## WC-4 (added after the review): C09, the fixed panel itself, three families on 0
+
+- **Question** (C09, age on a reference date): revenue of customers exactly 25 years old on 2026-09-26.
+  **Reference** 487980 (Python recomputation over 68 lines).
+- **Nature**: real values from three runs: north-mini-code in the base batch (`C-jason-1`), qwen3.8-27b in
+  `FULL-1`, `D-paul-2` and `D-kuresa-2` (3 of its 5 runs), dots in `E-jason-1`. Found by
+  [`scan_shared_errors.py`](scan_shared_errors.py), not by reading the tables.
+- **Cause in the SQL**: three different filters, each **contradictory**, so each selects nothing:
+
+```sql
+-- qwen3.8-27b: age taken at the ORDER date (not the reference date), then m-d >= birth m-d AND m-d < birth m-d
+WHERE year(o.date) - year(c.birth_date) = 25 AND strftime('%m-%d', o.date) >= strftime('%m-%d', c.birth_date)
+  AND strftime('%m-%d', o.date) < strftime('%m-%d', date(c.birth_date, '+26 years'))
+-- north-mini-code: born on or before 2026-09-26 AND on or after 2027-09-26
+WHERE '2026-09-26' >= c.birth_date AND strftime('%Y-%m-%d', '2026-09-26', '+1 year') <= c.birth_date
+-- dots-3-note: born after 2001-09-26 (younger than 25) AND 25th anniversary on or before 2026-09-26
+WHERE c.birth_date > '2001-09-26' AND (year(birth) + 25 || month-day(birth)) <= '2026-09-26' AND ...
+```
+
+- **Declared quorum, 2-of-3**: fixed panel with the base runs (A-jason-1, C-jason-1, D-kuresa-1) →
+  consensus 487980, correct. The same fixed panel with qwen from D-kuresa-2 →
+  `{"consensus": true, "value": 0, "votes": 2}` (north + qwen), a **wrong consensus of the declared panel**.
+  Over every combination of one run per member: 16 right, **12 wrong**, 12 abstentions out of 40
+  ([`results/shared-errors.md`](results/shared-errors.md), section 2).
+- **Independent check**: the same non-empty probe: 68 order lines, smallest 1250 cents, so 0 is refuted.
+  Section 3 of `shared-errors.md` applies it to every wrong 0 of the traces (C02, C08, C09, C10, C11, C15,
+  C19): it refutes all of them.
+
 ## DEMO-VOTE: supplied synthetic case, kept apart from our counts
 
 Constructed teaching material from the TD 2 statement, not model output or shop data. One sale on
@@ -96,10 +131,11 @@ Check: a boundary probe (count rows equal to the lower bound: 1), which refutes 
 
 ## Consequence for the panel and the checking
 
-1. Agreement is an absence of disagreement, not a proof (CM2). Our fixed panel was not caught on our data,
-   but swapping one member for a cheaper one (WC-1) or for a free one (WC-2, WC-3) produces a wrong
-   consensus on the same traces. The choice of panel is part of the risk.
-2. Shared errors have recognisable shapes: an **empty result read as 0** (WC-1, WC-2, DEMO-VOTE) and a
+1. Agreement is an absence of disagreement, not a proof (CM2). Our fixed panel was not caught in the base
+   batch, but only by luck of the run: with another run of qwen3.8-27b it agrees on 0 for C09 (WC-4), and
+   swapping one member for a cheaper one (WC-1) or for a free one (WC-2, WC-3) produces a wrong consensus
+   on the same traces. The choice of panel, and the stability of its members, are part of the risk.
+2. Shared errors have recognisable shapes: an **empty result read as 0** (WC-1, WC-2, WC-4, DEMO-VOTE) and a
    **shared convention error** (WC-3). Each has a cheap deterministic check: the non-empty probe, the
    boundary probe, the decomposition of the age condition. They are written into the routing rule.
 3. Where only one family is right (C10, C15 C17 C19), a quorum cannot confirm the correct answer. The
