@@ -16,14 +16,14 @@ The families follow `questions-td1.json` (`type` field); "completed age at a dat
 is `age on a reference date`, "age at the order" is `age at the time of the order`,
 "combinations" is every type containing a `+`.
 """
-import csv
-import importlib.util
 import json
 import sys
 from collections import defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "td2"))
+from common import load_vote, proposal_from_row, read_csv, reference_values  # noqa: E402
 MODELS = ["openai/gpt-oss-20b", "openai/gpt-oss-120b", "qwen/qwen3.8-27b",
           "cohere/north-mini-code:free", "dots-studio/dots-3-note-preview:free"]
 SHORT = {m: m.split("/")[1].replace("-preview:free", "").replace(":free", "") for m in MODELS}
@@ -35,16 +35,7 @@ PANELS = {  # distinct families only: gpt-oss, Cohere, Qwen, Dots
     "alt {gpt-oss-20b, qwen3.8-27b, dots-3-note}":
         ["openai/gpt-oss-20b", "qwen/qwen3.8-27b", "dots-studio/dots-3-note-preview:free"],
 }
-PROVIDER = {"cohere/north-mini-code:free": "openrouter", "dots-studio/dots-3-note-preview:free": "openrouter"}
 FAMILIES = ["period", "completed age at a date", "age at the order", "product list", "combinations"]
-
-
-def load_vote():
-    spec = importlib.util.spec_from_file_location("skeleton", ROOT / "skeleton-multi-llm-en.py")
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[spec.name] = module
-    spec.loader.exec_module(module)
-    return lambda proposals, k: module.Orchestrateur.vote_k_sur_n(None, proposals, k)
 
 
 def main():
@@ -54,9 +45,9 @@ def main():
     for q in questions:
         cases[family[q["id"]]].append(q["id"])
 
-    with (ROOT / "td1" / "traces-td1.csv").open(encoding="utf-8", newline="") as handle:
-        rows = list(csv.DictReader(handle))
+    rows = read_csv(ROOT / "td1" / "traces-td1.csv")
     last, base_runs, run_order = {}, {}, {}
+    provider = {r["model_requested"]: r["provider"] for r in rows}  # read from the traces, not guessed
     for r in rows:  # file order = attempt order inside each run
         last[(r["run_id"], r["model_requested"], r["case_id"])] = r
         run_order.setdefault(r["model_requested"], [])
@@ -90,17 +81,15 @@ def main():
 
     # Candidate 2-of-3 panels, voted with the group's vote_k_sur_n (no network).
     vote = load_vote()
-    refs = {r["case_id"]: int(r["revenue_cents"]) for r in
-            csv.DictReader((ROOT / "td1" / "reference-td1.csv").open(encoding="utf-8", newline=""))}
+    refs = reference_values(ROOT / "td1" / "reference-td1.csv")
 
     def proposals(panel, case, source):
         out = []
         for m in panel:
             run = base_runs[m] if source == "base" else "FULL-1"
-            r = last.get((run, m, case))
-            ok = r is not None and r["verdict"] in ("correct", "incorrect") and r["value"] != ""
-            out.append({"provider": PROVIDER.get(m, "groq"), "model_requested": m,
-                        "value": int(r["value"]) if ok else None, "verdict": "executed" if ok else "error"})
+            # A missing cell is an unavailable member: it keeps its place in n.
+            r = last.get((run, m, case)) or {"provider": provider[m], "model_requested": m, "verdict": "absent"}
+            out.append(proposal_from_row(r))
         return out
 
     print("## Candidate 2-of-3 panels per family (vote_k_sur_n, k=2, n=3)\n")

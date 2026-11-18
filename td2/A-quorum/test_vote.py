@@ -7,7 +7,6 @@ except T11, which replays the stored trace of run FULL-1 on C09 (nature = real).
     python td2/A-quorum/test_vote.py
 """
 import csv
-import importlib.util
 import json
 import sys
 from pathlib import Path
@@ -16,11 +15,10 @@ from types import SimpleNamespace
 ROOT = Path(__file__).resolve().parents[2]
 HERE = Path(__file__).resolve().parent
 
-spec = importlib.util.spec_from_file_location("skeleton", ROOT / "skeleton-multi-llm-en.py")
-skeleton = importlib.util.module_from_spec(spec)
-sys.modules[spec.name] = skeleton
-spec.loader.exec_module(skeleton)
-vote = lambda proposals, k: skeleton.Orchestrateur.vote_k_sur_n(None, proposals, k)  # noqa: E731
+sys.path.insert(0, str(ROOT / "td2"))
+from common import load_vote, proposal_from_row, read_csv  # noqa: E402
+
+vote = load_vote()
 
 A = ("groq", "openai/gpt-oss-120b")
 B = ("openrouter", "cohere/north-mini-code:free")
@@ -62,17 +60,12 @@ CASES = [
 
 def real_c09_full1():
     """T11: FULL-1, C09: north-mini-code returned sql_invalid (no value) -> unavailable member."""
-    rows = list(csv.DictReader((ROOT / "td1/traces-raw/traces-td1_full.csv").open(encoding="utf-8", newline="")))
+    rows = read_csv(ROOT / "td1/traces-raw/traces-td1_full.csv")
     last = {}
     for r in rows:
         if r["case_id"] == "C09":
             last[(r["provider"], r["model_requested"])] = r
-    values = []
-    for route in PANEL3:
-        r = last[route]
-        ok = r["verdict"] in {"correct", "incorrect"} and r["value"] != ""
-        values.append(int(r["value"]) if ok else None)
-    return values
+    return [proposal_from_row(last[route]).value for route in PANEL3]
 
 
 def main():

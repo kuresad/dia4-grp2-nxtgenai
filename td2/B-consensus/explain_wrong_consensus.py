@@ -14,7 +14,6 @@ Sections
   4. DEMO-VOTE: the supplied synthetic case, on a one-row toy table
 """
 import csv
-import importlib.util
 import json
 import sqlite3
 import sys
@@ -25,20 +24,13 @@ from types import SimpleNamespace
 ROOT = Path(__file__).resolve().parents[2]
 DB = ROOT / "data" / "boutique.sqlite"
 sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "td2"))
 from sandbox_sqlite import execute_query  # noqa: E402  (kit file, read-only sandbox)
-
-
-def load_vote():
-    spec = importlib.util.spec_from_file_location("skeleton", ROOT / "skeleton-multi-llm-en.py")
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[spec.name] = module
-    spec.loader.exec_module(module)
-    return lambda proposals, k: module.Orchestrateur.vote_k_sur_n(None, proposals, k)
-
+from common import load_vote, proposal_from_row, read_csv, reference_rows  # noqa: E402
 
 VOTE = load_vote()
-TRACES = list(csv.DictReader((ROOT / "td1" / "traces-td1.csv").open(encoding="utf-8", newline="")))
-REFS = {r["case_id"]: r for r in csv.DictReader((ROOT / "td1" / "reference-td1.csv").open(encoding="utf-8", newline=""))}
+TRACES = read_csv(ROOT / "td1" / "traces-td1.csv")
+REFS = reference_rows(ROOT / "td1" / "reference-td1.csv")
 
 
 def final_row(model, case, *, run_id=None, base=False):
@@ -101,11 +93,7 @@ def show_case(title, case, members, nature):
 
 
 def vote_line(label, members):
-    proposals = [SimpleNamespace(provider=r["provider"], model_requested=r["model_requested"],
-                                 value=int(r["value"]) if r["verdict"] in {"correct", "incorrect"} and r["value"] else None,
-                                 verdict="executed" if r["verdict"] in {"correct", "incorrect"} and r["value"] else "error")
-                 for r in members]
-    decision = VOTE(proposals, 2)
+    decision = VOTE([proposal_from_row(r) for r in members], 2)
     print(f"  {label}: {json.dumps(decision)}")
     return decision
 
