@@ -1,63 +1,67 @@
-# TD 1: five models, twenty questions (21 October 2026)
+# TD 1 : cinq modèles, vingt questions (21 octobre 2026)
 
-Deliverables of TD 1. Paths stored inside the files (`source_file` of the traces, `trace_file` of the
-comparison CSV, such as `traces-raw/state-A.jsonl`) are relative to this `td1/` folder. The kit code and
-the database used to produce them are at the [repository root](../README.md).
+Livrables du TD 1. Les chemins écrits *dans* les fichiers (`source_file` des traces, `trace_file` de la
+comparaison, par exemple `traces-raw/state-A.jsonl`) sont relatifs à ce dossier `td1/`. Le code du kit et
+la base qui les ont produits sont à la [racine du dépôt](../README.md).
 
-## Deliverables
+## Livrables
 
-| Deliverable | File | Status |
+| Livrable | Fichier | État |
 |---|---|---|
-| Twenty references, query and value | [`reference-td1.csv`](reference-td1.csv) | Done in step 1; re-checked by SQL and by an independent Python recomputation, all 20 equal ([note](notes/reference-checks-td1.md)) |
-| Every attempt, all runs | [`traces-td1.csv`](traces-td1.csv), [`traces-td1.jsonl`](traces-td1.jsonl) | 319 attempts, 11 runs, all `nature = real`; the JSONL holds the same rows as the CSV, in the skeleton's state format |
-| Base batch only (100 cells) | [`traces-td1-base.csv`](traces-td1-base.csv), [`traces-td1-base.jsonl`](traces-td1-base.jsonl) | 106 attempts: 100 first attempts + 6 retries after HTTP 429 (the rows of `traces-td1.csv` with `in_base_batch = yes`) |
-| Raw files of each operator | [`traces-raw/`](traces-raw/) | Kept unchanged |
-| One final row per model x question | [`model-question-comparison-en_J.csv`](model-question-comparison-en_J.csv) | 100 rows from the base batch, cause of every failure in `explanation`; [`model-question-comparison-en_R.csv`](model-question-comparison-en_R.csv) is the earlier version built from `FULL-1` only |
-| Pivot view models x questions | [`notes/pivot-td1.md`](notes/pivot-td1.md) | Generated from the comparison CSV; also every run and the cells that change between runs |
-| Five-model summary | [`five-model-summary-en.csv`](five-model-summary-en.csv) | Index, dated prices or N/A with reason, access, results by family |
-| Prompts as used | [`prompts-en.md`](prompts-en.md) | One version, unchanged in TD 2 (fingerprints checked) |
-| Session report | `../reports/td1.md` | **Missing**: to be written by the group |
+| Vingt références, requête et valeur | [`reference-td1.csv`](reference-td1.csv) | Fait à l'étape 1 ; revérifiées en SQL et par un recalcul Python indépendant, les 20 concordent ([note](notes/reference-checks-td1.md)) |
+| Toutes les tentatives, tous les runs | [`traces-td1.csv`](traces-td1.csv), [`traces-td1.jsonl`](traces-td1.jsonl) | 319 tentatives, 11 runs, toutes `nature = real` ; le JSONL contient les mêmes lignes que le CSV, au format d'état du skeleton |
+| Lot de base seul (100 cellules) | [`traces-td1-base.csv`](traces-td1-base.csv), [`traces-td1-base.jsonl`](traces-td1-base.jsonl) | 106 tentatives : 100 premières tentatives + 6 retry après HTTP 429 (les lignes de `traces-td1.csv` avec `in_base_batch = yes`) |
+| Fichiers bruts de chaque opérateur | [`traces-raw/`](traces-raw/) | Conservés sans modification |
+| Une ligne finale par modèle × question | [`model-question-comparison-en_J.csv`](model-question-comparison-en_J.csv) | 100 lignes du lot de base, cause de chaque échec dans `explanation` ; [`model-question-comparison-en_R.csv`](model-question-comparison-en_R.csv) est la version antérieure, construite sur `FULL-1` seul |
+| Vue croisée modèles × questions | [`notes/pivot-td1.md`](notes/pivot-td1.md) | Générée depuis la comparaison ; contient aussi chaque run et les cellules qui changent d'un run à l'autre |
+| Synthèse des cinq modèles | [`five-model-summary-en.csv`](five-model-summary-en.csv) | Indice, prix datés ou N/A avec raison, accès, résultats par famille |
+| Prompts tels qu'utilisés | [`prompts-en.md`](prompts-en.md) | Une seule version, inchangée au TD 2 (empreintes vérifiées) |
+| Rapport de séance | `../reports/td1.md` | **Manquant** : à écrire par le groupe |
 
-## The runs
+## Les runs
 
-All runs used the same prompt (same fingerprint per question), the same references and the kit
-parameters. The base batch follows the A-E allocation of the protocol, one run per model; the other
-runs are repetitions, each started with its own `--state`/`--out` files, so they are separate
-experiments and never count as retries.
+Tous les runs ont utilisé le même prompt (même empreinte par question), les mêmes références et les
+paramètres du kit. Le lot de base suit la répartition A à E du protocole, un run par modèle. Les autres runs
+sont des répétitions, chacune lancée avec ses propres fichiers `--state`/`--out` : ce sont des expériences
+distinctes, jamais comptées comme des retry.
 
-| run_id | Operator | Model | Raw file | Start (UTC) | Base batch |
+| run_id | Opérateur | Modèle | Fichier brut | Début (UTC) | Lot de base |
 |---|---|---|---|---|---|
-| `FULL-1` | Enzo | all five models in one `--run` | `traces-raw/traces-td1_full.csv` | 2026-10-21 13:50 | yes for E (Dots) only |
-| `A-jason-1` | Jason (A) | `groq:openai/gpt-oss-120b` | `traces-raw/state-A.jsonl` | 14:12 | yes |
-| `B-1` | Yohan (B) | `groq:openai/gpt-oss-20b` | `traces-raw/traces-B.csv` | 14:14 | yes |
-| `D-kuresa-1` | Kuresa (D) | `groq:qwen/qwen3.8-27b` | `traces-raw/state-D-Kuresa.jsonl` | 14:17 | yes |
-| `D-paul-1` | Paul | `groq:qwen/qwen3.8-27b` | `traces-raw/state-D-Paul.jsonl` | 14:17 | repetition |
-| `A-op2-1` | kuresa | `groq:openai/gpt-oss-120b` | `traces-raw/trace_A.csv` | 14:20 | repetition |
-| `A-jason-2` | Jason | `groq:openai/gpt-oss-120b` | `traces-raw/state-A_2.jsonl` | 14:31 | repetition |
-| `D-paul-2` | Paul | `groq:qwen/qwen3.8-27b` | `traces-raw/state-D_2-Paul.jsonl` | 14:32 | repetition |
-| `D-kuresa-2` | Kuresa | `groq:qwen/qwen3.8-27b` | `traces-raw/state-D-Kuresa2.jsonl` | 14:35 | repetition |
-| `C-jason-1` | Florent | `openrouter:cohere/north-mini-code:free` | `traces-raw/state-C.jsonl` | 14:37 | yes |
-| `E-jason-1` | Jason  | `openrouter:dots-studio/dots-3-note-preview:free` | `traces-raw/state-E-Jason.jsonl` | 19:18 | repetition |
+| `FULL-1` | Enzo | les cinq modèles en un seul `--run` | `traces-raw/traces-td1_full.csv` | 2026-10-21 13:50 | oui pour E (Dots) seulement |
+| `A-jason-1` | Jason (A) | `groq:openai/gpt-oss-120b` | `traces-raw/state-A.jsonl` | 14:12 | oui |
+| `B-1` | Yohan (B) | `groq:openai/gpt-oss-20b` | `traces-raw/traces-B.csv` | 14:14 | oui |
+| `D-kuresa-1` | Kuresa (D) | `groq:qwen/qwen3.8-27b` | `traces-raw/state-D-Kuresa.jsonl` | 14:17 | oui |
+| `D-paul-1` | Paul | `groq:qwen/qwen3.8-27b` | `traces-raw/state-D-Paul.jsonl` | 14:17 | répétition |
+| `A-op2-1` | Kuresa | `groq:openai/gpt-oss-120b` | `traces-raw/trace_A.csv` | 14:20 | répétition |
+| `A-jason-2` | Jason | `groq:openai/gpt-oss-120b` | `traces-raw/state-A_2.jsonl` | 14:31 | répétition |
+| `D-paul-2` | Paul | `groq:qwen/qwen3.8-27b` | `traces-raw/state-D_2-Paul.jsonl` | 14:32 | répétition |
+| `D-kuresa-2` | Kuresa | `groq:qwen/qwen3.8-27b` | `traces-raw/state-D-Kuresa2.jsonl` | 14:35 | répétition |
+| `C-jason-1` | Florent | `openrouter:cohere/north-mini-code:free` | `traces-raw/state-C.jsonl` | 14:37 | oui |
+| `E-jason-1` | Jason | `openrouter:dots-studio/dots-3-note-preview:free` | `traces-raw/state-E-Jason.jsonl` | 19:18 | répétition |
 
-## Commands to replay (from the repository root)
+Les retry (HTTP 429) de ces runs sont analysés au TD 2 :
+[`../td2/A-quorum/results/retries.md`](../td2/A-quorum/results/retries.md).
+
+## Commandes de rejeu (depuis la racine du dépôt)
 
 ```bash
-python verify-data.py                          # hashes of the base and CSV files, "ok": true
-python check_access.py --no-network            # Python, base and CSV fingerprints, no model call
+python verify-data.py                          # empreintes de la base et des CSV, "ok": true
+python check_access.py --no-network            # Python, empreintes de la base et des CSV, aucun appel aux modèles
 python skeleton-multi-llm-en.py --rates --state td1/traces-td1-base.jsonl --reference td1/reference-td1.csv
 ```
 
-These commands make no network call. A new model run (not needed for TD 2 or TD 3) is, for one model:
+Ces commandes ne font aucun appel réseau. Un nouveau run d'un modèle (inutile pour les TD 2 et 3) se lance
+ainsi :
 
 ```bash
 python skeleton-multi-llm-en.py --run --models groq:openai/gpt-oss-120b --reference td1/reference-td1.csv --state state-new.jsonl --out traces-new.csv
 ```
 
-with `GROQ_API_KEY` / `OPENROUTER_API_KEY` set in the shell (never in a file of the repository).
+avec `GROQ_API_KEY` / `OPENROUTER_API_KEY` définies dans le terminal, jamais dans un fichier du dépôt.
 
-## Open blocks
+## Points ouverts
 
-- Member names, roles B, F, G, H, the operator of `FULL-1` and of `A-op2-1`.
-- The group used far more calls than the 100-cell base batch (319 attempts: 239 Groq, 80 OpenRouter):
-  the repetitions were not in the planned allocation. They are kept and labelled, never mixed into the
-  base-batch rates.
+- Noms des membres pour les rôles B, F, G, H ; opérateur de `FULL-1` et de `A-op2-1`.
+- Le groupe a fait bien plus d'appels que les 100 cellules du lot de base (319 tentatives : 239 Groq,
+  80 OpenRouter). Les répétitions ne figuraient pas dans la répartition prévue. Elles sont conservées et
+  étiquetées, jamais mêlées aux taux du lot de base.

@@ -24,3 +24,27 @@ Steps 1 and 2 (`td2/A-quorum`, `td2/B-consensus`, the `vote_k_sur_n` method) wer
 uncommitted, in the working copy when this session started (files dated 18 November, 14:41 to 14:44). This
 session re-ran them and checked their outputs, then added the commentary, step 3 and the report. Who wrote
 them, and with which prompt, is to be confirmed by the group.
+
+## Later prompts of the same session (French, verbatim)
+
+Repository layout:
+
+> Avant que je pousse pour terminer organise le dossier github pour avoir la partie td1 dans son dossier et
+> td2 dans son dossier (deja fait) et un readme generale aussi. aussi j'ai deja pousser vers github verifie.
+
+Cross-reviews (`td2/reviews/`) and the fixes they cite:
+
+> Apparement chaque groupe A[1] (Jason et Yohan), B[2] (Roy , Enzo, Florent) et C[3] (Kuresa, Paul et
+> Thomas) doit faire un review de la partie des uns et autres, on doit expliquer les erreurs du groupe et
+> expliquer les retry, c'est en d'autre terme une analyse du code des autres. Donc sert toi aussi des echecs
+> que tu eu comme idée pour les analyses. le prof dit qu'on est censé dire si on aurai pu faire mieux, s'il ya
+> un bug ou quelque chose de problematique la review doit indiquer les ameliorations faites pour ameliorer le
+> code. Fais en sorte que les review n'adresse pas forcement le meme probleme ou ameliorations si une review
+> l'a deja faite. Tu comprends ? explique ce que tu as compris avant que tu puisse commencer.
+
+> 1. Six reviews. 2. b. s'il ya encore des ameliorations (ne prends pas en compte les erreurs que seul une ia
+> peut faire) mais base toi aussi sur des modifications que tu as du faire qui ameliorait le code. 3. refais
+> les readme et les reviews en francais. Tu peux faire un dossier reviews mais repeter dans chaque step
+> (A-quorumetc...)
+
+The groups read and checked the reviews before the hand-in; each fix is in its own commit, cited in the review.

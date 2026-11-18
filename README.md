@@ -1,70 +1,74 @@
-# Trustworthy generative AI - sub-group DIA4 GRP2
-ESILV, Next-Generation AI (MESIIN475926), Didier Parisot. Public repository of the sub-group for TD 1, 2 and 3.
+# IA générative de confiance : sous-groupe DIA4 GRP2
 
-| Item | Value |
+ESILV, Next-Generation AI (MESIIN475926), Didier Parisot. Dépôt public du sous-groupe pour les TD 1, 2 et 3.
+
+| Élément | Valeur |
 |---|---|
-| Sub-group | GRP2 |
-| Members | Jason ZOH, Kuresa RAMEN, Paul CHARMOILLE, Enzo SIERRA-GUISSET, Roy WEHBE, Yohan ALLOUCHE, Florent SEYDOUX, Thomas ANQUETIN |
-| Pack version | `2026-10-14-students-1` (kit of 14 October 2026) |
-| Database | `data/boutique.sqlite`, SHA-256 `0077e235adc2ca647b484e3083c98a6d7cae3ef3655ce366a299caf13398fec2`, seed 20260925, identical to `data/manifest.json` |
-| Environment | Windows 11, Python 3.14.7, SQLite 3.50.4, `requests` in a `.venv` (only for `check_access.py`); the skeleton and scripts use the standard library |
-| Repository URL | <https://github.com/kuresad/dia4-grp2-nxtgenai> |
+| Sous-groupe | GRP2 |
+| Membres | Jason ZOH, Kuresa RAMEN, Paul CHARMOILLE, Enzo SIERRA-GUISSET, Roy WEHBE, Yohan ALLOUCHE, Florent SEYDOUX, Thomas ANQUETIN |
+| Version du pack | `2026-10-14-students-1` (kit du 14 octobre 2026) |
+| Base de données | `data/boutique.sqlite`, SHA-256 `0077e235adc2ca647b484e3083c98a6d7cae3ef3655ce366a299caf13398fec2`, graine 20260925, identique à `data/manifest.json` |
+| Environnement | Windows 11, Python 3.14.7, SQLite 3.50.4, `requests` dans un `.venv` (seulement pour `check_access.py`) ; le skeleton et les scripts n'utilisent que la bibliothèque standard |
+| Dépôt | <https://github.com/kuresad/dia4-grp2-nxtgenai> |
 
-## Layout
+## Organisation
 
 ```text
 .
-├── README.md                  this file
-├── reports/                   one session report per TD (td1.md, td2.md, td3.md)
-├── td1/                       TD 1 deliverables: references, traces, comparison, summary, prompts
-├── td2/                       TD 2 deliverables: vote (A-quorum), wrong consensus (B-consensus), routing (C-routing)
-├── td3/                       TD 3 (to come)
+├── README.md                  ce fichier
+├── reports/                   un rapport de séance par TD (td1.md, td2.md, td3.md)
+├── td1/                       livrables du TD 1 : références, traces, comparaison, synthèse, prompts
+├── td2/                       livrables du TD 2 : vote (A-quorum), faux consensus (B-consensus),
+│                              routage (C-routing), revues croisées (reviews), module commun (common.py)
+├── td3/                       TD 3 (à venir)
 │
-│   Kit, shared by the three TDs (kept at the root: each script looks for its resources next to itself)
-├── skeleton-multi-llm-en.py   multi-model orchestrator; vote_k_sur_n completed in TD 2
-├── atelier-vote.py            TD 2 vote workshop (kit, unchanged)
-├── atelier-routage.py         TD 2/3 routing simulator (kit, unchanged)
-├── sandbox_sqlite.py          read-only SQL sandbox
-├── check_access.py            access check of the five models
-├── verify-data.py             hashes of the database and CSV files
-├── data/                      boutique.sqlite and its CSV files, manifest
+│   Kit, commun aux trois TD (laissé à la racine : chaque script cherche ses ressources à côté de lui)
+├── skeleton-multi-llm-en.py   orchestrateur multi-modèles ; vote_k_sur_n complété au TD 2
+├── atelier-vote.py            atelier de vote du TD 2 (kit, non modifié)
+├── atelier-routage.py         simulateur de routage des TD 2 et 3 (kit, non modifié)
+├── sandbox_sqlite.py          bac à sable SQL en lecture seule
+├── check_access.py            vérification d'accès aux cinq modèles
+├── verify-data.py             empreintes de la base et des CSV
+├── data/                      boutique.sqlite, ses CSV et son manifeste
 ├── schema.sql, questions-td1.json, modeles-autorises.json
-└── .gitignore, .gitattributes keys, environments and caches stay out; kit data byte-identical
+└── .gitignore, .gitattributes clés, environnements et caches exclus ; données du kit gardées identiques à l'octet
 ```
 
-## Status per session
+## État par séance
 
-| TD | Date | Folder | Report | Summary |
+| TD | Date | Dossier | Rapport | Résumé |
 |---|---|---|---|---|
-| TD 1 | 21 October 2026 | [`td1/`](td1/README.md) | `reports/td1.md` (**missing**) | 20 references; 319 attempts over 11 runs of 5 models; base batch: gpt-oss-20b 20/20, gpt-oss-120b 18/20, qwen3.8-27b 16/20, dots-3-note 14/20, north-mini-code 10/20 |
-| TD 2 | 18 November 2026 | [`td2/`](td2/README.md) | [`reports/td2.md`](reports/td2.md) | `vote_k_sur_n` (16/16 tests); fixed 2-of-3 panel on the base batch: 16 consensus, 0 wrong, 4 abstentions; wrong consensus explained (C02, C10, C11, DEMO-VOTE); routing rule and simulator before/after |
-| TD 3 | to come | `td3/` | `reports/td3.md` | cost worksheet, use case, slides, demonstration |
+| TD 1 | 21 octobre 2026 | [`td1/`](td1/README.md) | `reports/td1.md` (**manquant**) | 20 références ; 319 tentatives sur 11 runs de 5 modèles ; lot de base : gpt-oss-20b 20/20, gpt-oss-120b 18/20, qwen3.8-27b 16/20, dots-3-note 14/20, north-mini-code 10/20 |
+| TD 2 | 18 novembre 2026 | [`td2/`](td2/README.md) | [`reports/td2.md`](reports/td2.md) | `vote_k_sur_n` (19/19 tests) ; panel fixe 2 sur 3 sur le lot de base : 16 consensus, 0 faux, 4 abstentions, mais faux consensus sur C09 avec d'autres runs ; faux consensus expliqués ; règle de routage et simulateur avant et après ; [six revues croisées](td2/reviews/README.md) |
+| TD 3 | à venir | `td3/` | `reports/td3.md` | feuille de coûts, cas d'usage, diapositives, démonstration |
 
-## Quick check (no network, from the root)
+## Vérification rapide (sans réseau, depuis la racine)
 
 ```bash
 python verify-data.py                                   # "ok": true
-python check_access.py --no-network                     # Python, base and CSV fingerprints
+python check_access.py --no-network                     # Python, empreintes de la base et des CSV
 python skeleton-multi-llm-en.py --rates --state td1/traces-td1-base.jsonl --reference td1/reference-td1.csv
-python td2/A-quorum/test_vote.py                        # 16/16 tests pass
-python td2/C-routing/atelier-routage-grp2.py            # our routing rule on the scenarios
+python td2/A-quorum/test_vote.py                        # 19/19 tests
+python td2/C-routing/atelier-routage-grp2.py            # notre règle de routage sur les scénarios
 ```
 
-Every TD 1 and TD 2 command is listed in [`td1/README.md`](td1/README.md) and [`td2/README.md`](td2/README.md).
-A new model run needs `GROQ_API_KEY` / `OPENROUTER_API_KEY` in the shell, never in a file of the repository.
+Toutes les commandes du TD 1 et du TD 2 sont dans [`td1/README.md`](td1/README.md) et
+[`td2/README.md`](td2/README.md). Un nouvel appel aux modèles demande `GROQ_API_KEY` / `OPENROUTER_API_KEY`
+dans le terminal, jamais dans un fichier du dépôt.
 
-## Repository hygiene
+## Hygiène du dépôt
 
-No key, no `.env`, no account screenshot is committed. The kit's `.gitignore` is at the root
-(environment files, keys, `.venv/`, caches, `ready-for-td1.txt`). The saved `check_access.py` output of
-18 October 2026 (all five models OK) stays on the members' machines, as the `.gitignore` provides.
+Aucune clé, aucun `.env`, aucune capture de compte n'est commitée. Le `.gitignore` du kit est à la racine
+(fichiers d'environnement, clés, `.venv/`, caches, `ready-for-td1.txt`). La sortie de `check_access.py` du
+18 octobre 2026 (les cinq modèles OK) reste sur les machines des membres, comme le prévoit le `.gitignore`.
 
-## AI assistance
+## Assistance IA
 
-AI-assisted work is declared with the prompts as used: [`td2/ai-assistance-en.md`](td2/ai-assistance-en.md).
+L'assistance IA est déclarée, avec les prompts tels qu'ils ont été utilisés :
+[`td2/ai-assistance-en.md`](td2/ai-assistance-en.md).
 
-## Open blocks
+## Points ouverts
 
-- `reports/td1.md` is still to be written.
-- TD 2 contributions of each member, in [`reports/td2.md`](reports/td2.md).
-- TD 1: member roles B, F, G, H, the operator of `FULL-1` and of `A-op2-1` ([`td1/README.md`](td1/README.md)).
+- `reports/td1.md` reste à écrire.
+- Les contributions de chaque membre au TD 2, dans [`reports/td2.md`](reports/td2.md).
+- TD 1 : rôles B, F, G, H, opérateur de `FULL-1` et de `A-op2-1` ([`td1/README.md`](td1/README.md)).
