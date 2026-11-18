@@ -15,16 +15,12 @@ ESILV, Next-Generation AI (MESIIN475926), Didier Parisot. Public repository of t
 | Deliverable | File | Status |
 |---|---|---|
 | Twenty references, query and value | [`reference-td1.csv`](reference-td1.csv) | Done in step 1; re-checked by SQL and by an independent Python recomputation, all 20 equal ([note](notes/reference-checks-td1.md)) |
-| Every attempt, all runs | [`traces-td1.csv`](traces-td1.csv), [`traces-td1.jsonl`](traces-td1.jsonl) | 319 attempts, 11 runs, all `nature = real` |
-| Base batch only (100 cells) | [`traces-td1-base.csv`](traces-td1-base.csv), [`traces-td1-base.jsonl`](traces-td1-base.jsonl) | 106 attempts: 100 first attempts + 6 retries after HTTP 429 |
+| Every attempt, all runs | [`traces-td1.csv`](traces-td1.csv), [`traces-td1.jsonl`](traces-td1.jsonl) | 319 attempts, 11 runs, all `nature = real`; the JSONL holds the same rows as the CSV, in the skeleton's state format |
+| Base batch only (100 cells) | [`traces-td1-base.csv`](traces-td1-base.csv), [`traces-td1-base.jsonl`](traces-td1-base.jsonl) | 106 attempts: 100 first attempts + 6 retries after HTTP 429 (the rows of `traces-td1.csv` with `in_base_batch = yes`) |
 | Raw files of each operator | [`traces-raw/`](traces-raw/) | Kept unchanged |
-| One final row per model x question | [`model-question-comparison-en.csv`](model-question-comparison-en.csv) | 100 rows, cause of every failure in `explanation` |
+| One final row per model x question | [`model-question-comparison-en_J.csv`](model-question-comparison-en_J.csv) | 100 rows from the base batch, cause of every failure in `explanation`; [`model-question-comparison-en_R.csv`](model-question-comparison-en_R.csv) is the earlier version built from `FULL-1` only |
 | Pivot view models x questions | [`notes/pivot-td1.md`](notes/pivot-td1.md) | Generated from the comparison CSV; also every run and the cells that change between runs |
 | Five-model summary | [`five-model-summary-en.csv`](five-model-summary-en.csv) | Index, dated prices or N/A with reason, access, results by family |
-| Prompts as used | [`prompts-en.md`](prompts-en.md) | Kit prompt unchanged, fingerprints, declared coding assistance |
-| Session report | [`reports/td1.md`](reports/td1.md) | Done |
-| Contributions | [`contributions-en.csv`](contributions-en.csv) | Partly filled |
-
 
 ## The runs
 
