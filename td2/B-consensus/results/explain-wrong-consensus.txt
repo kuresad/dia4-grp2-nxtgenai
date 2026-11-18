@@ -2,8 +2,8 @@
 === Case WC-1: C02 in run FULL-1 (one run, five models, same prompt) ===
 nature: real batch (historical real, stored trace replayed offline)
 reference-td1.csv C02 = 590320 (re-executed: 590320); independent Python recomputation = 590320 over 82 order lines
-- openai/gpt-oss-20b: stored value 0, verdict incorrect, replayed value 0 [traces-raw/traces-td1_full.csv, 2026-10-21 13:50:26]
-- cohere/north-mini-code:free: stored value 0, verdict incorrect, replayed value 0 [traces-raw/traces-td1_full.csv, 2026-10-21 13:50:32]
+- openai/gpt-oss-20b: stored value 0, verdict incorrect, replayed value 0 [td1/traces-raw/traces-td1_full.csv, 2026-10-21 13:50:26]
+- cohere/north-mini-code:free: stored value 0, verdict incorrect, replayed value 0 [td1/traces-raw/traces-td1_full.csv, 2026-10-21 13:50:32]
   non-empty check: 82 order lines belong to customers aged 25 on 2026-09-25, all prices and quantities > 0, so 0 is impossible
   quorum, 2-of-3:
   declared fixed panel {gpt-oss-120b, north-mini-code, qwen3.8-27b}: {"consensus": true, "value": 590320, "votes": 2, "models": ["groq:openai/gpt-oss-120b", "groq:qwen/qwen3.8-27b"]}
@@ -12,8 +12,8 @@ reference-td1.csv C02 = 590320 (re-executed: 590320); independent Python recompu
 === Case WC-2: C11 in the base batch ===
 nature: real batch (base batch = one run per model)
 reference-td1.csv C11 = 446690 (re-executed: 446690); independent Python recomputation = 446690 over 60 order lines
-- cohere/north-mini-code:free: stored value 0, verdict incorrect, replayed value 0 [traces-raw/state-C.jsonl, 2026-10-21 14:38:44]
-- dots-studio/dots-3-note-preview:free: stored value 0, verdict incorrect, replayed value 0 [traces-raw/traces-td1_full.csv, 2026-10-21 13:54:13]
+- cohere/north-mini-code:free: stored value 0, verdict incorrect, replayed value 0 [td1/traces-raw/state-C.jsonl, 2026-10-21 14:38:44]
+- dots-studio/dots-3-note-preview:free: stored value 0, verdict incorrect, replayed value 0 [td1/traces-raw/traces-td1_full.csv, 2026-10-21 13:54:13]
   non-empty check: 60 order lines belong to customers aged 25 on 2026-12-01
   quorum, 2-of-3:
   declared fixed panel {gpt-oss-120b, north-mini-code, qwen3.8-27b}: {"consensus": true, "value": 446690, "votes": 2, "models": ["groq:openai/gpt-oss-120b", "groq:qwen/qwen3.8-27b"]}
@@ -22,8 +22,8 @@ reference-td1.csv C11 = 446690 (re-executed: 446690); independent Python recompu
 === Case WC-3: C10, same NON-ZERO wrong value from two families ===
 nature: real, but the two values come from two different runs (base D-kuresa-1 and repetition E-jason-1)
 reference-td1.csv C10 = 558980 (re-executed: 558980); independent Python recomputation = 558980 over 73 order lines
-- qwen/qwen3.8-27b (D-kuresa-1, base): stored value 119410, verdict incorrect, replayed value 119410 [traces-raw/state-D-Kuresa.jsonl, 2026-10-21 14:17:33]
-- dots-studio/dots-3-note-preview:free (E-jason-1, repetition): stored value 119410, verdict incorrect, replayed value 119410 [traces-raw/state-E-Jason.jsonl, 2026-10-21 19:19:40]
+- qwen/qwen3.8-27b (D-kuresa-1, base): stored value 119410, verdict incorrect, replayed value 119410 [td1/traces-raw/state-D-Kuresa.jsonl, 2026-10-21 14:17:33]
+- dots-studio/dots-3-note-preview:free (E-jason-1, repetition): stored value 119410, verdict incorrect, replayed value 119410 [td1/traces-raw/state-E-Jason.jsonl, 2026-10-21 19:19:40]
   cause check: year difference 25 and birthday reached = 119410; year difference 26 and birthday not yet reached = 439570; sum = 558980
   quorum, 2-of-3:
   declared fixed panel {gpt-oss-120b, north-mini-code, qwen3.8-27b} (base runs): {"consensus": false, "value": null, "votes": 1, "models": []}

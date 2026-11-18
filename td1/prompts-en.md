@@ -1,11 +1,11 @@
 # Prompts, exactly as used
 
 Single version, used for every model and every run of TD 1 (21 October 2026). **Unchanged in TD 2**: TD 2
-made no model call, and [`td2/check_prompts.py`](td2/check_prompts.py) rebuilds the twenty prompts from
-`skeleton-multi-llm-en.py` and finds the same SHA-256 as all 319 rows of `traces-td1.csv`
-([output](td2/check-prompts.txt)). Source: `SYSTEM_PROMPT` and `USER_PROMPT_TEMPLATE` in
-[`skeleton-multi-llm-en.py`](skeleton-multi-llm-en.py); `{schema}` is [`schema.sql`](schema.sql),
-`{question}` is the `question` of [`questions-td1.json`](questions-td1.json). Fingerprint:
+made no model call, and [`td2/check_prompts.py`](../td2/check_prompts.py) rebuilds the twenty prompts from
+`skeleton-multi-llm-en.py` and finds the same SHA-256 as all 319 rows of [`traces-td1.csv`](traces-td1.csv)
+([output](../td2/check-prompts.txt)). Source: `SYSTEM_PROMPT` and `USER_PROMPT_TEMPLATE` in
+[`skeleton-multi-llm-en.py`](../skeleton-multi-llm-en.py); `{schema}` is [`schema.sql`](../schema.sql),
+`{question}` is the `question` of [`questions-td1.json`](../questions-td1.json). Fingerprint:
 `sha256(system + "\n" + user)`, stored in `prompt_sha256`.
 
 ## System message

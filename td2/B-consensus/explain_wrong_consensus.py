@@ -37,8 +37,8 @@ def load_vote():
 
 
 VOTE = load_vote()
-TRACES = list(csv.DictReader((ROOT / "traces-td1.csv").open(encoding="utf-8", newline="")))
-REFS = {r["case_id"]: r for r in csv.DictReader((ROOT / "reference-td1.csv").open(encoding="utf-8", newline=""))}
+TRACES = list(csv.DictReader((ROOT / "td1" / "traces-td1.csv").open(encoding="utf-8", newline="")))
+REFS = {r["case_id"]: r for r in csv.DictReader((ROOT / "td1" / "reference-td1.csv").open(encoding="utf-8", newline=""))}
 
 
 def final_row(model, case, *, run_id=None, base=False):
@@ -96,7 +96,7 @@ def show_case(title, case, members, nature):
     for label, row in members:
         replay = execute_query(DB, row["sql"])
         print(f"- {label}: stored value {row['value']}, verdict {row['verdict']}, "
-              f"replayed value {replay['value']} [{row['source_file']}, {row['date_utc']}]")
+              f"replayed value {replay['value']} [td1/{row['source_file']}, {row['date_utc']}]")
     return py_value, py_lines
 
 

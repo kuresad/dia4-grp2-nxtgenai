@@ -3,7 +3,7 @@
 
 Rebuilds, with the skeleton's own `build_prompt`, the prompt of each of the twenty
 questions and compares its SHA-256 with the `prompt_sha256` of every row of
-`traces-td1.csv`.
+`td1/traces-td1.csv`.
 
     python td2/check_prompts.py
 """
@@ -22,7 +22,7 @@ spec.loader.exec_module(skeleton)
 schema = (ROOT / "schema.sql").read_text(encoding="utf-8")
 questions = json.loads((ROOT / "questions-td1.json").read_text(encoding="utf-8"))["questions"]
 expected = {q["id"]: skeleton.build_prompt(schema, q["question"])[2] for q in questions}
-rows = list(csv.DictReader((ROOT / "traces-td1.csv").open(encoding="utf-8", newline="")))
+rows = list(csv.DictReader((ROOT / "td1" / "traces-td1.csv").open(encoding="utf-8", newline="")))
 mismatch = [(r["run_id"], r["model_requested"], r["case_id"]) for r in rows
             if r["prompt_sha256"] != expected[r["case_id"]]]
 print(f"{len(rows)} trace rows, {len(expected)} prompts rebuilt from skeleton-multi-llm-en.py; "

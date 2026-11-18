@@ -23,7 +23,7 @@ import argparse
 import json
 
 # Paid-equivalent cost of ONE request on the usage-billed route of the same model:
-# mean base-batch tokens of traces-td1.csv (in_base_batch = yes) x Groq prices of
+# mean base-batch tokens of td1/traces-td1.csv (in_base_batch = yes) x Groq prices of
 # methode-cout-en.md step 2 (checked 2026-10-05), USD excl. tax.
 #   gpt-oss-20b : 641 in x 0.075 + 286 out x 0.30 per million -> 0.000134
 #   gpt-oss-120b: 641 in x 0.15  + 259 out x 0.60 per million -> 0.000252

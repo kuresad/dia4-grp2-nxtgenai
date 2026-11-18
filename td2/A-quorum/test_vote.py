@@ -62,7 +62,7 @@ CASES = [
 
 def real_c09_full1():
     """T11: FULL-1, C09: north-mini-code returned sql_invalid (no value) -> unavailable member."""
-    rows = list(csv.DictReader((ROOT / "traces-raw/traces-td1_full.csv").open(encoding="utf-8", newline="")))
+    rows = list(csv.DictReader((ROOT / "td1/traces-raw/traces-td1_full.csv").open(encoding="utf-8", newline="")))
     last = {}
     for r in rows:
         if r["case_id"] == "C09":
@@ -92,7 +92,7 @@ def main():
         print(f"{'PASS' if ok else 'FAIL'} {test_id} {description}: {actual}")
         out_rows.append({
             "test_id": test_id,
-            "nature": "real (traces-raw/traces-td1_full.csv, run FULL-1)" if test_id == "T11" else "simulation",
+            "nature": "real (td1/traces-raw/traces-td1_full.csv, run FULL-1)" if test_id == "T11" else "simulation",
             "panel": " ".join(f"{r[0]}:{r[1]}" for r in panel),
             "fixed_n": len(panel),
             "k": k,

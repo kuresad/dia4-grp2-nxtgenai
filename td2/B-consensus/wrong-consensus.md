@@ -16,10 +16,10 @@ is not the result of the fixed panel. Dots is not a member of that panel.
 ## WC-1 (main case): C02, run FULL-1, real batch
 
 - **Question** (C02, age on a reference date): revenue of customers who are exactly 25 years old (completed
-  age) on 2026-09-25. **Reference** 590320 (`reference-td1.csv`, re-executed; Python recomputation 590320
+  age) on 2026-09-25. **Reference** 590320 (`td1/reference-td1.csv`, re-executed; Python recomputation 590320
   over 82 order lines).
 - **Nature**: real batch, stored trace replayed offline. One run, five models, same prompt
-  (`traces-raw/traces-td1_full.csv`, 2026-10-21 13:50).
+  (`td1/traces-raw/traces-td1_full.csv`, 2026-10-21 13:50).
 - **Agreeing models**: `groq:openai/gpt-oss-20b` → **0**, `openrouter:cohere/north-mini-code:free` → **0**.
   Two families, the same wrong value.
 - **Cause in the SQL**: the two errors are different, and both end up on an empty set:
@@ -47,7 +47,7 @@ WHERE ... c.birth_date <= date('2026-09-25','-25 years') AND c.birth_date > date
 - **Question** (C10, age at the time of the order): revenue of orders placed by customers aged exactly 25
   on the order date. **Reference** 558980 (Python recomputation over 73 lines).
 - **Nature**: real values, but from two different runs: qwen in the base batch (`D-kuresa-1`,
-  `traces-raw/state-D-Kuresa.jsonl`), dots in a repetition (`E-jason-1`, `traces-raw/state-E-Jason.jsonl`).
+  `td1/traces-raw/state-D-Kuresa.jsonl`), dots in a repetition (`E-jason-1`, `td1/traces-raw/state-E-Jason.jsonl`).
   The panel below is recomposed across runs, as an **illustration only**.
 - **Agreeing models**: `groq:qwen/qwen3.8-27b` → **119410**, `openrouter:dots-studio/dots-3-note-preview:free`
   → **119410**.
@@ -65,7 +65,7 @@ WHERE year(o.date) - year(c.birth_date) = 25 AND (month, day of order) >= (month
   "difference 26, birthday not reached" = 439570 over 59 lines; 119410 + 439570 = 558980, the reference.
   This is the "convention broken" cause of CM2, shared by two vendors, although the binding conventions
   of the prompt say "computed from month and day, never from the year difference alone"
-  ([`prompts-en.md`](../../prompts-en.md)): writing the convention in the prompt did not prevent it. gpt-oss-120b avoids it with date
+  ([`prompts-en.md`](../../td1/prompts-en.md)): writing the convention in the prompt did not prevent it. gpt-oss-120b avoids it with date
   arithmetic: `date(o.date) >= date(c.birth_date,'+25 years') AND date(o.date) < date(c.birth_date,'+26 years')`.
 - **Declared quorum, 2-of-3**: fixed panel (base runs) → `{"consensus": false, "value": null, "votes": 1}`,
   abstention (120b 558980, north 0, qwen 119410). Panel {gpt-oss-120b, qwen3.8-27b, dots-3-note} (across runs) →

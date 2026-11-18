@@ -10,11 +10,11 @@ the value each panel member proposed (read with the workshop's own
 `proposals_for`, so the same "last attempt per member" selection) to make the
 table readable. The reference is only used AFTER the decision, by the workshop.
 
-    python td2/A-quorum/run_vote.py --traces traces-td1-base.csv --label base
-    python td2/A-quorum/run_vote.py --traces traces-raw/traces-td1_full.csv --label full1
+    python td2/A-quorum/run_vote.py --traces td1/traces-td1-base.csv --label base
+    python td2/A-quorum/run_vote.py --traces td1/traces-raw/traces-td1_full.csv --label full1
 
 One file = one experiment: `atelier-vote.py` takes the last row per panel member,
-so a file that mixes runs (such as `traces-td1.csv`) must not be used here.
+so a file that mixes runs (such as `td1/traces-td1.csv`) must not be used here.
 """
 import argparse
 import csv

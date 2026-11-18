@@ -3,7 +3,7 @@
 Sub-group DIA4 GRP2, session of 18 November 2026, pack `2026-10-14-students-1`. **No model was called in
 TD 2**: every figure below replays the stored TD 1 traces offline (`nature = real`), except the
 simulations and the synthetic DEMO-VOTE, which are labelled as such. The prompts did not change
-([`prompts-en.md`](../prompts-en.md); 319/319 trace fingerprints match, [`td2/check-prompts.txt`](../td2/check-prompts.txt)).
+([`prompts-en.md`](../td1/prompts-en.md); 319/319 trace fingerprints match, [`td2/check-prompts.txt`](../td2/check-prompts.txt)).
 
 ## What was attempted and completed
 
@@ -59,14 +59,14 @@ simulations and the synthetic DEMO-VOTE, which are labelled as such. The prompts
 - *Hypothesis*: the year-difference age error is a shared training habit. It appears in two vendors'
   models although the prompt forbids it.
 - *Observed*: the same model and prompt at temperature 0 change verdict between runs (gpt-oss-20b on C02
-  and C11, qwen3.8-27b on C09 and C16, see `notes/pivot-td1.md`). Eligibility from one base run is
+  and C11, qwen3.8-27b on C09 and C16, see [`td1/notes/pivot-td1.md`](../td1/notes/pivot-td1.md)). Eligibility from one base run is
   therefore fragile. The rule cites the repetitions when they disagree.
 
 ## Limits
 
 Twenty questions and a few runs per model: a batch-specific observation, not an error rate, a permanent
 ranking or a guarantee of the quorum. The vote tables use one experiment file at a time. The merged
-`traces-td1.csv` mixes runs, and `atelier-vote.py` takes the last row per member. WC-3 combines two runs
+`td1/traces-td1.csv` mixes runs, and `atelier-vote.py` takes the last row per member. WC-3 combines two runs
 and is an illustration. Simulator availabilities are assumptions. The "3-of-5" quorum of the statement
 cannot be built with distinct families from our five models: gpt-oss-20b and gpt-oss-120b are one family,
 which leaves four. The rule therefore uses 2-of-3 plus a reference.
@@ -75,7 +75,7 @@ which leaves four. The rule therefore uses 2-of-3 plus a reference.
 
 | Member | TD 2 work | Files |
 |---|---|---|
-| Roy WEHBE | step 3 (rule, evidence, simulator), commentary of step 2, prompts check, report; with AI assistance ([`td2/ai-assistance-en.md`](../td2/ai-assistance-en.md)) | `td2/C-routing/`, `td2/B-consensus/wrong-consensus.md`, `td2/check_prompts.py`, `prompts-en.md`, this report |
+| Roy WEHBE | step 3 (rule, evidence, simulator), commentary of step 2, prompts check, report; with AI assistance ([`td2/ai-assistance-en.md`](../td2/ai-assistance-en.md)) | `td2/C-routing/`, `td2/B-consensus/wrong-consensus.md`, `td2/check_prompts.py`, `td1/prompts-en.md`, this report |
 | *to confirm* | step 1 (vote and tests), step 2 scripts | `skeleton-multi-llm-en.py`, `td2/A-quorum/`, `td2/B-consensus/explain_wrong_consensus.py` |
 | Jason ZOH, Kuresa RAMEN, Paul CHARMOILLE, Enzo SIERRA-GUISSET, Yohan ALLOUCHE, Florent SEYDOUX, Thomas ANQUETIN | *to be completed by each member* (roles of the day: vote, wrong-consensus search, rule, simulator, presentation) | |
 
@@ -92,8 +92,8 @@ which leaves four. The rule therefore uses 2-of-3 plus a reference.
 ```bash
 python td2/A-quorum/test_vote.py                                   # 16 contract tests
 python atelier-vote.py                                             # the kit's four synthetic examples
-python td2/A-quorum/run_vote.py --traces traces-td1-base.csv --label base
-python td2/A-quorum/run_vote.py --traces traces-raw/traces-td1_full.csv --label full1
+python td2/A-quorum/run_vote.py --traces td1/traces-td1-base.csv --label base
+python td2/A-quorum/run_vote.py --traces td1/traces-raw/traces-td1_full.csv --label full1
 python td2/B-consensus/explain_wrong_consensus.py
 python td2/C-routing/family_evidence.py > td2/C-routing/results/family-evidence.md
 python atelier-routage.py                                          # kit rule (before)
